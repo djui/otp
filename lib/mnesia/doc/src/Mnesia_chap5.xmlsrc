@@ -981,6 +981,16 @@ ok
             is reported to the error_logger. 
             </p>
         </item>
+        <tag><c>{mnesia_load_table, Table, Status}</c></tag>
+        <item>
+          <p>Mnesia is loading or has loaded a table.</p>
+          <p><c>Table</c> is the name of the table that currently gets loaded or
+            that finished being loaded. <c>Status</c> is either <c>loading</c>,
+            <c>loaded</c> when the table was successfully loaded, or
+            <c>{not_loaded, Reason}</c> if the table was not loaded given the
+            error reason <c>Reason</c>.
+            </p>
+        </item>
         <tag><c>{inconsistent_database, Context, Node}</c></tag>
         <item>
           <p>Mnesia regards the database as

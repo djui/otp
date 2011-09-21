@@ -177,6 +177,17 @@ handle_system_event({inconsistent_database, Reason, Node}, State) ->
 		 [Reason, Node]),
     {ok, State}; 
 
+handle_system_event({mnesia_table_load, Tab, Status}, State) ->
+    case Status of
+        loading ->
+            report_info("loading table ~p~n", [Tab]);
+        loaded ->
+            report_info("table ~p was loaded~n", [Tab]);
+        {not_loaded, Reason} ->
+            report_warning("table ~p was not loaded: ~p~n", [Tab, Reason])
+    end,
+    {ok, State};
+
 handle_system_event({mnesia_user, Event}, State) ->
     report_info("User event: ~p~n", [Event]),
     {ok, State}; 

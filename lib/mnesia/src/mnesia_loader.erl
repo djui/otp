@@ -52,11 +52,14 @@ disc_load_table(Tab, Reason) ->
 		     {reason, Reason},
 		     {storage, Storage},
 		     {type, Type}]),
+    mnesia_lib:report_system_event({mnesia_table_load, Tab, loading}),
     do_get_disc_copy2(Tab, Reason, Storage, Type).
 
 do_get_disc_copy2(Tab, _Reason, Storage, _Type) when Storage == unknown ->
     verbose("Local table copy of ~p has recently been deleted, ignored.~n",
 	    [Tab]),
+    mnesia_lib:report_system_event({mnesia_table_load, Tab,
+                                    {not_loaded, storage_unknown}}),
     {loaded, ok};  %% ?
 do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == disc_copies ->
     %% NOW we create the actual table
@@ -79,6 +82,7 @@ do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == disc_copies ->
     snmpify(Tab, Storage),
     set({Tab, load_node}, node()),
     set({Tab, load_reason}, Reason),
+    mnesia_lib:report_system_event({mnesia_table_load, Tab, loaded}),
     {loaded, ok};
 
 do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == ram_copies ->
@@ -112,6 +116,7 @@ do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == ram_copies ->
     snmpify(Tab, Storage),
     set({Tab, load_node}, node()),
     set({Tab, load_reason}, Reason),
+    mnesia_lib:report_system_event({mnesia_table_load, Tab, loaded}),
     {loaded, ok};
 
 do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == disc_only_copies ->
@@ -125,6 +130,7 @@ do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == disc_only_copies -
 	    snmpify(Tab, Storage),
 	    set({Tab, load_node}, node()),
 	    set({Tab, load_reason}, Reason),
+	    mnesia_lib:report_system_event({mnesia_table_load, Tab, loaded}),
 	    {loaded, ok};
 	_ ->
 	    case mnesia_monitor:open_dets(Tab, Args) of
@@ -133,8 +139,10 @@ do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == disc_only_copies -
 		    snmpify(Tab, Storage),
 		    set({Tab, load_node}, node()),
 		    set({Tab, load_reason}, Reason),
+		    mnesia_lib:report_system_event({mnesia_table_load, Tab, loaded}),
 		    {loaded, ok};
 		{error, Error} ->
+		    mnesia_lib:report_system_event({mnesia_table_load, Tab,
 		    {not_loaded, {"Failed to create dets table", Error}}
 	    end
     end.
@@ -172,12 +180,16 @@ do_get_disc_copy2(Tab, Reason, Storage, Type) when Storage == disc_only_copies -
 
 net_load_table(Tab, Reason, Ns, Cs)
         when Reason == {dumper,add_table_copy} ->
+    mnesia_lib:report_system_event({mnesia_table_load, Tab, loading}),
     try_net_load_table(Tab, Reason, Ns, Cs);
 net_load_table(Tab, Reason, Ns, _Cs) ->
+    mnesia_lib:report_system_event({mnesia_table_load, Tab, loading}),
     try_net_load_table(Tab, Reason, Ns, val({Tab, cstruct})).
 
 try_net_load_table(Tab, _Reason, [], _Cs) ->
     verbose("Copy failed. No active replicas of ~p are available.~n", [Tab]),
+    mnesia_lib:report_system_event({mnesia_table_load, Tab,
+                                    {not_loaded, none_active}}),
     {not_loaded, none_active};
 try_net_load_table(Tab, Reason, Ns, Cs) ->
     Storage = mnesia_lib:cs_to_storage_type(node(), Cs),
@@ -185,6 +197,8 @@ try_net_load_table(Tab, Reason, Ns, Cs) ->
 
 do_get_network_copy(Tab, _Reason, _Ns, unknown, _Cs) ->
     verbose("Local table copy of ~p has recently been deleted, ignored.~n", [Tab]),
+    mnesia_lib:report_system_event({mnesia_table_load, Tab,
+                                    {not_loaded, storage_unknown}}),
     {not_loaded, storage_unknown};
 do_get_network_copy(Tab, Reason, Ns, Storage, Cs) ->
     [Node | Tail] = Ns,
@@ -200,9 +214,12 @@ do_get_network_copy(Tab, Reason, Ns, Storage, Cs) ->
 		    set({Tab, load_node}, Node),
 		    set({Tab, load_reason}, Reason),
 		    mnesia_controller:i_have_tab(Tab),
+		    mnesia_lib:report_system_event({mnesia_table_load, Tab, loaded}),
 		    dbg_out("Table ~p copied from ~p to ~p~n", [Tab, Node, node()]),
 		    {loaded, ok};
 		Err = {error, _} when element(1, Reason) == dumper ->
+		    mnesia_lib:report_system_event({mnesia_table_load, Tab,
+		                                    {not_loaded, Err}}),
 		    {not_loaded,Err};
 		restart ->
 		    try_net_load_table(Tab, Reason, Tail ++ [Node], Cs);
