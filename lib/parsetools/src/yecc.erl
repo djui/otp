@@ -841,10 +841,10 @@ report_errors(St) ->
     case member(report_errors, St#yecc.options) of
         true ->
             foreach(fun({File,{none,Mod,E}}) -> 
-                            io:fwrite(<<"~s: ~s\n">>, 
+                            io:fwrite(standard_error, <<"~s: ~s\n">>, 
                                       [File,Mod:format_error(E)]);
                        ({File,{Line,Mod,E}}) -> 
-                            io:fwrite(<<"~s:~w: ~s\n">>, 
+                            io:fwrite(standard_error, <<"~s:~w: ~s\n">>, 
                                       [File,Line,Mod:format_error(E)])
                     end, sort(St#yecc.errors));
         false -> 
@@ -861,11 +861,11 @@ report_warnings(St) ->
     case member(report_warnings, St#yecc.options) orelse ReportWerror of
         true ->
             foreach(fun({File,{none,Mod,W}}) -> 
-                            io:fwrite(<<"~s: ~s~s\n">>,
+                            io:fwrite(standard_error, <<"~s: ~s~s\n">>,
                                       [File,Prefix,
 				       Mod:format_error(W)]);
                        ({File,{Line,Mod,W}}) -> 
-                            io:fwrite(<<"~s:~w: ~s~s\n">>,
+                            io:fwrite(standard_error, <<"~s:~w: ~s~s\n">>,
                                       [File,Line,Prefix,
 				       Mod:format_error(W)])
                     end, sort(St#yecc.warnings));
@@ -1549,12 +1549,13 @@ find_action_conflicts(St0) ->
               end, {Cxt0, []}, St0#yecc.parse_actions),
     if 
         length(Res) > 0, St#yecc.verbose -> 
-            io:fwrite(<<"\n*** Conflicts resolved by operator "
+            io:fwrite(standard_error,
+                      <<"\n*** Conflicts resolved by operator "
                         "precedences:\n\n">>),
             foreach(fun({Confl, Name}) ->
                             report_conflict(Confl, St, Name, prec)
                     end, reverse(Res)),
-            io:fwrite(<<"*** End of resolved conflicts\n\n">>);
+            io:fwrite(standard_error, <<"*** End of resolved conflicts\n\n">>);
         true -> 
             ok
     end,

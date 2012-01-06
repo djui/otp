@@ -648,11 +648,11 @@ expand(List, Defs, Err, War, [FileName|IncFile], IncDir, Mio) ->
 %% Main loop for the expansion
 %%=======================================================
 expand([], Out, _SelfRef, Defs, _IncFile, _IncDir, Mio, IfCou, Err, War, _L, _FN) ->
-%    io:format("~n   ===============~n"),
-%    io:format("   definitions    ~p~n",[lists:reverse(Defs)]),
-%    io:format("   found warnings ~p~n",[lists:reverse(War)]),
-%    io:format("   found errors   ~p~n",[lists:reverse(Err)]),
-%    io:format("   ===============~n~n~n"),
+%    io:format(standard_error, "~n   ===============~n"),
+%    io:format(standard_error, "   definitions    ~p~n",[lists:reverse(Defs)]),
+%    io:format(standard_error, "   found warnings ~p~n",[lists:reverse(War)]),
+%    io:format(standard_error, "   found errors   ~p~n",[lists:reverse(Err)]),
+%    io:format(standard_error, "   ===============~n~n~n"),
     {Out, Err, War, Defs, Mio, IfCou};
 
 expand([{file_info, Str} | Rem], Out, SelfRef, Defs, IncFile, IncDir, Mio, IfCou, Err, War, L, FN) ->
@@ -856,7 +856,7 @@ expand([{command,Command} | Rem], Out, SelfRef, Defs, IncFile, IncDir, Mio, chec
 	    end;
 
 	Else ->
-%	    io:format(" %%%%Else%%%%%% ~p~n",[Else]),
+%	    io:format(standard_error, " %%%%Else%%%%%% ~p~n",[Else]),
 	    exit(Else)
     end;
 

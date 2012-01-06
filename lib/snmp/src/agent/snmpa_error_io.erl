@@ -45,5 +45,5 @@ config_err(F, A) ->
 
 
 error_msg(P, F, A) ->
-    io:format("*** SNMP ~s *** ~n" ++ F ++ "~n", [P|A]).
+    io:format(standard_error, "*** SNMP ~s *** ~n" ++ F ++ "~n", [P|A]).
 

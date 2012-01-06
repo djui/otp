@@ -81,19 +81,19 @@ gen(File, Opts) ->
     case catch gen2(G, File, Opts) of
 	{_, {'EXIT', R}} -> 
 	    ic_genobj:free_table_space(G), %% Free space for all ETS tables
-	    io:format("Fatal error : ~p~n",[R]),
+	    io:format(standard_error, "Fatal error : ~p~n",[R]),
 	    error;
 	{_, {'EXIT', _, R}} -> 
 	    ic_genobj:free_table_space(G), %% Free space for all ETS tables
-	    io:format("Fatal error : ~p~n",[R]),
+	    io:format(standard_error, "Fatal error : ~p~n",[R]),
 	    error;
 	{'EXIT', R} -> 
 	    ic_genobj:free_table_space(G), %% Free space for all ETS tables
-	    io:format("Fatal error : ~p~n",[R]),
+	    io:format(standard_error, "Fatal error : ~p~n",[R]),
 	    error;
 	{'EXIT', _, R} -> 
 	    ic_genobj:free_table_space(G), %% Free space for all ETS tables
-	    io:format("Fatal error : ~p~n",[R]),
+	    io:format(standard_error, "Fatal error : ~p~n",[R]),
 	    error;	
 	%% In this case, the pragma registration 
         %% found errors so this should return error.
@@ -335,7 +335,7 @@ typing(G, File, Clean) ->
 		       time("type code appliance  ", ic, do_type, [G,Clean]),
 		       ic:do_type(G,Clean)) of
 	{'EXIT',Reason} ->
-	    io:format("Error under type appliance : ~p~n",[Reason]),
+	    io:format(standard_error, "Error under type appliance : ~p~n",[Reason]),
 	    error;
        
 	T2 ->	    

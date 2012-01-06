@@ -82,7 +82,7 @@ terminate({ok, Data}, St) ->
 	    sync_end(error)
     end;
 terminate({error, Reason}, _St) ->
-    io:fwrite("Internal error: ~P.\n", [Reason, 25]),
+    io:fwrite(standard_error, "Internal error: ~P.\n", [Reason, 25]),
     sync_end(error).
 
 sync_end(Result) ->
@@ -212,18 +212,18 @@ print_test_end(Data) ->
 
 print_test_error({error, Exception}, Data) ->
     Output = proplists:get_value(output, Data),
-    io:fwrite("*failed*\n::~s",
+    io:fwrite(standard_error, "*failed*\n::~s",
 	      [eunit_lib:format_exception(Exception)]),
     case Output of
 	<<>> ->
-	    io:put_chars("\n\n");
+	    io:put_chars(standard_error, "\n\n");
 	<<Text:800/binary, _:1/binary, _/binary>> ->
-	    io:fwrite("  output:<<\"~s\">>...\n\n", [Text]);
+	    io:fwrite(standard_error, "  output:<<\"~s\">>...\n\n", [Text]);
 	_ ->
-	    io:fwrite("  output:<<\"~s\">>\n\n", [Output])
+	    io:fwrite(standard_error, "  output:<<\"~s\">>\n\n", [Output])
     end;
 print_test_error({skipped, Reason}, _) ->
-    io:fwrite("*did not run*\n::~s\n", [format_skipped(Reason)]).
+    io:fwrite(standard_error, "*did not run*\n::~s\n", [format_skipped(Reason)]).
 
 format_skipped({module_not_found, M}) ->
     io_lib:format("missing module: ~w", [M]);
@@ -231,13 +231,13 @@ format_skipped({no_such_function, {M,F,A}}) ->
     io_lib:format("no such function: ~w:~w/~w", [M,F,A]).    
 
 print_test_cancel(Reason) ->
-    io:fwrite(format_cancel(Reason)).
+    io:fwrite(standard_error, format_cancel(Reason)).
 
 print_group_cancel(_I, {blame, _}) ->
     ok;
 print_group_cancel(I, Reason) ->
     indent(I),
-    io:fwrite(format_cancel(Reason)).
+    io:fwrite(standard_error, format_cancel(Reason)).
 
 format_cancel(undefined) ->
     "*skipped*\n";

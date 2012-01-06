@@ -271,7 +271,7 @@ cl_halt({ok, R = ?RET_DISCREPANCIES}, #options{output_file = Output}) ->
   halt(R);
 cl_halt({error, Msg1}, #options{output_file = Output}) ->
   %% Msg2 = "dialyzer: Internal problems were encountered in the analysis",
-  io:format("\ndialyzer: ~s\n", [Msg1]),
+  io:format(standard_error, "\ndialyzer: ~s\n", [Msg1]),
   cl_check_log(Output),
   halt(?RET_INTERNAL_ERROR).
 

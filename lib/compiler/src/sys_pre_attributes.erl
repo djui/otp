@@ -182,7 +182,7 @@ attrs([], _, _) ->
 report_error(Format, Args, S) -> 
     case is_error(S) of
 	true ->
-	    io:format("~p: * ERROR * " ++ Format, [?MODULE | Args]);
+	    io:format(standard_error, "~p: * ERROR * " ++ Format, [?MODULE | Args]);
 	false ->
 	    ok
     end.
@@ -190,7 +190,7 @@ report_error(Format, Args, S) ->
 report_warning(Format, Args, S) -> 
     case is_warning(S) of
 	true ->
-	    io:format("~p: * WARNING * " ++ Format, [?MODULE | Args]);
+	    io:format(standard_error, "~p: * WARNING * " ++ Format, [?MODULE | Args]);
 	false ->
 	    ok
     end.

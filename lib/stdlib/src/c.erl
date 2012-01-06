@@ -35,7 +35,7 @@
 
 -import(lists, [reverse/1,flatten/1,sublist/3,sort/1,keysort/2,
 		concat/1,max/1,min/1,foreach/2,foldl/3,flatmap/2]).
--import(io, [format/1, format/2]).
+-import(io, [format/1, format/2, format/3]).
 
 %%-----------------------------------------------------------------------
 
@@ -122,12 +122,14 @@ machine_load(Mod, File, Opts) ->
 		    code:purge(Mod),
 		    check_load(code:load_abs(File2,Mod), Mod);
 		_OtherMod ->
-		    format("** Module name '~p' does not match file name '~p' **~n",
+		    format(standard_error,
+			   "** Module name '~p' does not match file name '~p' **~n",
 			   [Mod,File]),
 		    {error, badfile}
 	    end;
 	false ->
-	    format("** Warning: No object file created - nothing loaded **~n", []),
+	    format(standard_error,
+			   "** Warning: No object file created - nothing loaded **~n", []),
 	    ok
     end.
 
@@ -162,7 +164,7 @@ lc(Args) ->
 -spec lc_batch() -> no_return().
 
 lc_batch() ->
-    io:format("Error: no files to compile~n"),
+    io:format(standard_error, "Error: no files to compile~n"),
     halt(1).
 
 -spec lc_batch([erl_compile:cmd_line_arg()]) -> no_return().
@@ -203,11 +205,11 @@ make_term(Str) ->
 	    case erl_parse:parse_term(Tokens ++ [{dot, 1}]) of
 		{ok, Term} -> Term;
 		{error, {_,_,Reason}} ->
-		    io:format("~s: ~s~n", [Reason, Str]),
+		    io:format(standard_error, "~s: ~s~n", [Reason, Str]),
 		    throw(error)
 	    end;
 	{error, {_,_,Reason}, _} ->
-	    io:format("~s: ~s~n", [Reason, Str]),
+	    io:format(standard_error, "~s: ~s~n", [Reason, Str]),
 	    throw(error)
     end.
 
@@ -682,7 +684,7 @@ pwd() ->
 	{ok, Str} ->
 	    ok = io:format("~ts\n", [fixup_one_bin(Str)]);
 	{error, _} ->
-	    ok = io:format("Cannot determine current directory\n")
+	    ok = io:format(standard_error, "Cannot determine current directory\n")
     end.
 
 -spec cd(Dir) -> 'ok' when
@@ -709,7 +711,7 @@ ls(Dir) ->
 	{ok, Entries} ->
 	    ls_print(sort(fixup_bin(Entries)));
 	{error,_E} ->
-	    format("Invalid directory\n")
+	    format(standard_error, "Invalid directory\n")
     end.
 
 fixup_one_bin(X) when is_binary(X) ->
@@ -799,7 +801,8 @@ appcall(App, M, F, Args) ->
 	    case erlang:get_stacktrace() of
 		[{M,F,Args,_}|_] ->
 		    Arity = length(Args),
-		    io:format("Call to ~w:~w/~w in application ~w failed.\n",
+		    io:format(standard_error,
+			      "Call to ~w:~w/~w in application ~w failed.\n",
 			      [M,F,Arity,App]);
 		Stk ->
 		    erlang:raise(error, undef, Stk)

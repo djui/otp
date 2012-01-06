@@ -301,7 +301,8 @@ cover_compile({none,_Exclude,Include,Cross}) ->
     CompileMods = Include++Cross,
     case length(CompileMods) of
 	0 ->
-	    io:fwrite("WARNING: No modules to cover compile!\n\n",[]),
+	    io:fwrite(standard_error,
+		      "WARNING: No modules to cover compile!\n\n",[]),
 	    cover:start(),			% start cover server anyway
 	    {ok,[]};
 	N ->
@@ -315,13 +316,15 @@ cover_compile({App,all,Include,Cross}) ->
     CompileMods = Include++Cross,
     case length(CompileMods) of
 	0 ->
-	    io:fwrite("WARNING: No modules to cover compile!\n\n",[]),
+	    io:fwrite(standard_error,
+		      "WARNING: No modules to cover compile!\n\n",[]),
 	    cover:start(),			% start cover server anyway
 	    {ok,[]};
 	N ->
 	    io:fwrite("Cover compiling '~w' (~w files) - "
 		      "this may take some time... ",[App,N]),
-	    io:format("\nWARNING: All modules in \'~w\' are excluded\n"
+	    io:format(standard_error,
+		      "\nWARNING: All modules in \'~w\' are excluded\n"
 		      "Only cover compiling modules in include list "
 		      "and the modules\nin the cross cover file:\n"
 		      "~p\n", [App,CompileMods]),
@@ -334,14 +337,16 @@ cover_compile({App,Exclude,Include,Cross}) ->
 	{error,bad_name} ->
 	    case Include++Cross of
 		[] ->
-		    io:format("\nWARNING: Can't find lib_dir for \'~w\'\n"
+		    io:format(standard_error,
+			      "\nWARNING: Can't find lib_dir for \'~w\'\n"
 			      "Not cover compiling!\n\n",[App]),
 		    {error,application_not_found};
 		CompileMods ->
 		    io:fwrite("Cover compiling '~w' (~w files) - "
 			      "this may take some time... ",
 			      [App,length(CompileMods)]),
-		    io:format("\nWARNING: Can't find lib_dir for \'~w\'\n"
+		    io:format(standard_error,
+			      "\nWARNING: Can't find lib_dir for \'~w\'\n"
 			      "Only cover compiling modules in include list: "
 			      "~p\n", [App,Include]),
 		    do_cover_compile(CompileMods),
@@ -356,7 +361,8 @@ cover_compile({App,Exclude,Include,Cross}) ->
 	    CompileMods = AnalyseMods ++ Cross,
 	    case length(CompileMods) of
 		0 ->
-		    io:fwrite("WARNING: No modules to cover compile!\n\n",[]),
+		    io:fwrite(standard_error,
+			      "WARNING: No modules to cover compile!\n\n",[]),
 		    cover:start(),		% start cover server anyway
 		    {ok,[]};
 		N ->
@@ -388,8 +394,8 @@ do_cover_compile1([M|Rest]) ->
 		{ok,_} ->
 		    ok;
 		Error ->
-		    io:fwrite("\nWARNING: Could not cover compile ~w: ~p\n",
-			      [M,Error])
+		    io:fwrite(standard_error,
+			      "\nWARNING: Could not cover compile ~w: ~p\n", [M,Error])
 	    end,
 	    code:stick_mod(M),
 	    do_cover_compile1(Rest);
@@ -398,7 +404,8 @@ do_cover_compile1([M|Rest]) ->
 		{module,_} ->
 		    do_cover_compile1([M|Rest]);
 		Error ->
-		    io:fwrite("\nWARNING: Could not load ~w: ~p\n",[M,Error]),
+		    io:fwrite(standard_error,
+		        "\nWARNING: Could not load ~w: ~p\n",[M,Error]),
 		    do_cover_compile1(Rest)
 	    end;
 	{false,_} ->
@@ -406,8 +413,8 @@ do_cover_compile1([M|Rest]) ->
 		{ok,_} ->
 		    ok;
 		Error ->
-		    io:fwrite("\nWARNING: Could not cover compile ~w: ~p\n",
-			      [M,Error])
+		    io:fwrite(standard_error,    
+			      "\nWARNING: Could not cover compile ~w: ~p\n", [M,Error])
 	    end,
 	    do_cover_compile1(Rest)
     end;
@@ -477,8 +484,8 @@ cover_analyse(Analyse,Modules) ->
 		      {ok,{M,{Cov,NotCov}}} ->
 			  {M,{Cov,NotCov,DetailsFun(M)}};
 		      Err ->
-			  io:fwrite("WARNING: Analysis failed for ~w. Reason: ~p\n",
-				    [M,Err]),
+			  io:fwrite(standard_error,
+				    "WARNING: Analysis failed for ~w. Reason: ~p\n", [M,Err]),
 			  {M,Err}
 		  end
 	  end, Modules),

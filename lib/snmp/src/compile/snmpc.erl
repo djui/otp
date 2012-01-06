@@ -63,7 +63,7 @@ compile(Input, _Output, Options) ->
         {ok, _} ->
             ok;
         {error, Reason} ->
-            io:format("~p", [Reason]),
+            io:format(standard_error, "~p", [Reason]),
             error
     end.
 

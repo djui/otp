@@ -87,7 +87,9 @@ compile(File) ->
 compile(File,Options) when is_list(Options) ->
     case lists:member(driver, Options) of %% remove me in R16A!
 	true ->
-	    io:format("Warning: driver option is obsolete and will be removed in R16A, use nif instead!");
+	    io:format(standard_error,
+		    "Warning: driver option is obsolete "
+		    "and will be removed in R16A, use nif instead!");
 	false ->
 	    ok
     end,
@@ -1460,18 +1462,18 @@ vsn() ->
 
 
 print_error_message([got,H|T]) when is_list(H) ->
-    io:format(" got:"),
+    io:format(standard_error, " got:"),
     print_listing(H,"and"),
     print_error_message(T);
 print_error_message([expected,H|T]) when is_list(H) ->
-    io:format(" expected one of:"),
+    io:format(standard_error, " expected one of:"),
     print_listing(H,"or"),
     print_error_message(T);
 print_error_message([H|T])  ->
-    io:format(" ~p",[H]),
+    io:format(standard_error, " ~p",[H]),
     print_error_message(T);
 print_error_message([]) ->
-    io:format("~n").
+    io:format(standard_error, "~n").
 
 print_listing([H1,H2|[]],AndOr) ->
     io:format(" ~p ~s ~p",[H1,AndOr,H2]);
@@ -2544,7 +2546,7 @@ type_check(#'Externaltypereference'{}) ->
 error(Format, Args, S) ->
     case is_error(S) of
 	true ->
-	    io:format(Format, Args);
+	    io:format(standard_error, Format, Args);
 	false ->
 	    ok
     end.
@@ -2552,7 +2554,7 @@ error(Format, Args, S) ->
 warning(Format, Args, S) ->
     case is_warning(S) of
 	true ->
-	    io:format("Warning: " ++ Format, Args);
+	    io:format(standard_error, "Warning: " ++ Format, Args);
 	false ->
 	    ok
     end.
@@ -2560,10 +2562,10 @@ warning(Format, Args, S) ->
 warning(Format, Args, S, Reason) ->
     case {is_werr(S), is_error(S), is_warning(S)} of
 	{true, true, _} ->
-	    io:format(Format, Args),
+	    io:format(standard_error, Format, Args),
 	    throw({error, Reason});
 	{false, _, true} ->
-	    io:format(Format, Args);
+	    io:format(standard_error, Format, Args);
 	_ ->
 	    ok
     end.

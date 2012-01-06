@@ -42,7 +42,7 @@ loop_test(If,Args) when is_list(Args) ->
 	no_loop ->
 	    false;
 	{error,E} ->
-	    io:format("Common Test error: ~p\n\n",[E]),
+	    io:format(standard_error, "Common Test error: ~p\n\n",[E]),
 	    file:set_cwd(Cwd),
 	    E;
 	{repeat,N} ->
@@ -79,25 +79,27 @@ loop(If,Type,N,Data0,Data1,Args,TPid) ->
     Pid = spawn_tester(If,self(),Args),
     receive 
 	{'EXIT',Pid,Reason} ->
-	    io:format("Test run crashed! This could be an internal error "
+	    io:format(standard_error,
+		      "Test run crashed! This could be an internal error "
 		      "- please report!\n\n"
 		      "~p\n\n",[Reason]),
 	    cancel(TPid),
 	    {error,Reason};
 	{Pid,{error,Reason}} ->
-	    io:format("\nTest run failed!\nReason: ~p\n\n",[Reason]),
+	    io:format(standard_error, "\nTest run failed!\nReason: ~p\n\n",[Reason]),
 	    cancel(TPid),
 	    {error,Reason};
 	{Pid,Result} ->
 	    if Type == repeat ->
-		    io:format("\nTest run ~w(~w) complete.\n\n",[N+1,Data0]),		    
+		    io:format("\nTest run ~w(~w) complete.\n\n",[N+1,Data0]),
 		    lists:keydelete(loop_info,1,Args),
 		    Args1 = [{loop_info,[{repeat,N+2,Data0}]} | Args],
 		    loop(If,repeat,N+1,Data0,Data1,Args1,TPid);
 	       Type == stop_time ->
 		    case remaining_time(Data1) of
 			0 ->
-			    io:format("\nTest time (~s) has run out.\n\n",[ts(Data0)]),
+			    io:format(standard_error,
+				      "\nTest time (~s) has run out.\n\n",[ts(Data0)]),
 			    cancel(TPid),
 			    Result;
 			Secs ->

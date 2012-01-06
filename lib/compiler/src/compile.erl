@@ -135,11 +135,11 @@ env_default_opts() ->
 			{ok,List} when is_list(List) -> List;
 			{ok,Term} -> [Term];
 			{error,_Reason} ->
-			    io:format("Ignoring bad term in ~s\n", [Key]),
+			    io:format(standard_error, "Ignoring bad term in ~s\n", [Key]),
 			    []
 		    end;
 		{error, {_,_,_Reason}, _} ->
-		    io:format("Ignoring bad term in ~s\n", [Key]),
+		    io:format(standard_error, "Ignoring bad term in ~s\n", [Key]),
 		    []
 	    end
     end.
@@ -1414,7 +1414,7 @@ report_warnings(#compile{options=Opts,warnings=Ws0}) ->
 			     ({F,Eds}) -> format_message(F, P, Eds) end,
 			  Ws0),
 	    Ws = lists:sort(Ws1),
-	    foreach(fun({_,Str}) -> io:put_chars(Str) end, Ws);
+	    foreach(fun({_,Str}) -> io:put_chars(standard_error, Str) end, Ws);
 	false -> ok
     end.
 
@@ -1434,13 +1434,13 @@ format_message(_, _, []) -> [].
 %% list_errors(File, ErrorDescriptors) -> ok
 
 list_errors(F, [{{Line,Column},Mod,E}|Es]) ->
-    io:fwrite("~s:~w:~w: ~s\n", [F,Line,Column,Mod:format_error(E)]),
+    io:fwrite(standard_error, "~s:~w:~w: ~s\n", [F,Line,Column,Mod:format_error(E)]),
     list_errors(F, Es);
 list_errors(F, [{Line,Mod,E}|Es]) ->
-    io:fwrite("~s:~w: ~s\n", [F,Line,Mod:format_error(E)]),
+    io:fwrite(standard_error, "~s:~w: ~s\n", [F,Line,Mod:format_error(E)]),
     list_errors(F, Es);
 list_errors(F, [{Mod,E}|Es]) ->
-    io:fwrite("~s: ~s\n", [F,Mod:format_error(E)]),
+    io:fwrite(standard_error, "~s: ~s\n", [F,Mod:format_error(E)]),
     list_errors(F, Es);
 list_errors(_F, []) -> ok.
 

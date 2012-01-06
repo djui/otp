@@ -1308,7 +1308,7 @@ fopen(F, ModeList) ->
 	{ok, Fd} -> 
 	    Fd;
 	{error, Reason} ->
-	    io:format("** Can't open file ~p ~n", [F]),
+	    io:format(standard_error, "** Can't open file ~p ~n", [F]),
 	    exit({error,Reason})
     end.
 

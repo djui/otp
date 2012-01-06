@@ -296,7 +296,8 @@ gen_member_2(G, N, X, [_T|Ts]) ->
 
 
 gen_exception(_G, N, X) ->
-    io:format("Warning : Exceptions not supported for java mapping, ~p ignored\n",
+    io:format(standard_error,
+	     "Warning : Exceptions not supported for java mapping, ~p ignored\n",
 	     [ic_util:to_colon([ic_forms:get_java_id(X)|N])]),
     ok.
 

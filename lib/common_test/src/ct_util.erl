@@ -370,7 +370,7 @@ loop(Mode,TestData,StartDir) ->
 	    loop(Mode,TestData,StartDir);
 	{'EXIT',Pid,Reason} ->
 	    %% Let process crash in case of error, this shouldn't happen!
-	    io:format("\n\nct_util_server got EXIT from ~p: ~p\n\n",
+	    io:format(standard_error, "\n\nct_util_server got EXIT from ~p: ~p\n\n",
 		      [Pid,Reason]),
 	    file:set_cwd(StartDir),
 	    exit(Reason)
@@ -907,7 +907,7 @@ open_url(iexplore, Args, URL) ->
 	    io:format(user, "~nOpening ~s with command:~n  ~s~n", [URL,Cmd1]),
 	    open_port({spawn,Cmd1}, []);
 	_ ->
-	    io:format("~nNo path to iexplore.exe~n",[])
+	    io:format(standard_error, "~nNo path to iexplore.exe~n",[])
     end,
     win32reg:close(R),
     ok;

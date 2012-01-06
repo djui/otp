@@ -175,7 +175,7 @@ application(App, Options) when is_atom(App) ->
  	Dir when is_list(Dir) ->
  	    application(App, Dir, Options);
  	_ ->
-	    edoc_report:report("cannot find application directory for '~s'.",
+	    edoc_report:report_error("cannot find application directory for '~s'.",
                                [App]),
  	    exit(error)
     end.
@@ -686,7 +686,7 @@ check_forms(Fs, Name) ->
 			 {L, M, D} ->
 			     edoc_report:error(L, Name, {format_error, M, D});
 			 Other ->
-			     edoc_report:report(Name, "unknown error in "
+			     edoc_report:report_error(Name, "unknown error in "
                                                 "source code: ~w.", [Other])
 		     end,
 		     exit(error);

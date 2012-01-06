@@ -298,7 +298,7 @@ init_master(Parent,NodeOptsList,EvHandlers,MasterLogDir,LogDirs,InitOptions,Spec
 	    register(ct_master,self()),
 	    ok;
 	_Pid ->
-	    io:format("~nWarning: ct_master already running!~n"),
+	    io:format(standard_error, "~nWarning: ct_master already running!~n"),
 	    exit(aborted)
 %	    case io:get_line('[y/n]>') of
 %		"y\n" ->
@@ -660,7 +660,8 @@ init_node_ctrl(MasterPid,Cookie,Opts) ->
 	pong ->
 	    MasterPid ! {self(),{result,Result}};
 	pang ->
-	    io:format("Warning! Connection to master node ~p is lost. "
+	    io:format(standard_error,
+		      "Warning! Connection to master node ~p is lost. "
 		      "Can't report result!~n~n", [MasterNode])
     end.
 
@@ -740,7 +741,8 @@ start_nodes(InitOptions)->
 	IsAlive = lists:member(NodeName, nodes()),
 	case {HasNodeStart, IsAlive} of
 	    {false, false}->
-		io:format("WARNING: Node ~p is not alive but has no node_start option~n", [NodeName]);
+		io:format(standard_error,
+		    "WARNING: Node ~p is not alive but has no node_start option~n", [NodeName]);
 	    {false, true}->
 		io:format("Node ~p is alive~n", [NodeName]);
 	    {true, false}->
@@ -751,10 +753,12 @@ start_nodes(InitOptions)->
 		    {ok, NodeName} ->
 			io:format("Node ~p started successfully with callback ~p~n", [NodeName,Callback]);
 		    {error, Reason, _NodeName} ->
-			io:format("Failed to start node ~p with callback ~p! Reason: ~p~n", [NodeName, Callback, Reason])
+			io:format(standard_error,
+				"Failed to start node ~p with callback ~p! Reason: ~p~n", [NodeName, Callback, Reason])
 		end;
 	    {true, true}->
-		io:format("WARNING: Node ~p is alive but has node_start option~n", [NodeName])
+		io:format(standard_error,
+			"WARNING: Node ~p is alive but has node_start option~n", [NodeName])
 	end
     end,
     InitOptions).
@@ -767,7 +771,8 @@ eval_on_nodes(InitOptions)->
 	    {false,_}->
 		ok;
 	    {true,false}->
-		io:format("WARNING: Node ~p is not alive but has eval option ~n", [NodeName]);
+		io:format(standard_error,
+			"WARNING: Node ~p is not alive but has eval option ~n", [NodeName]);
 	    {true,true}->
 		{eval, MFAs} = lists:keyfind(eval, 1, Options),
 		evaluate(NodeName, MFAs)
@@ -778,7 +783,8 @@ eval_on_nodes(InitOptions)->
 evaluate(Node, [{M,F,A}|MFAs])->
     case rpc:call(Node, M, F, A) of
         {badrpc,Reason}->
-	    io:format("WARNING: Failed to call ~p:~p/~p on node ~p due to ~p~n", [M,F,length(A),Node,Reason]);
+	    io:format(standard_error,
+		    "WARNING: Failed to call ~p:~p/~p on node ~p due to ~p~n", [M,F,length(A),Node,Reason]);
 	Result->
 	    io:format("Called ~p:~p/~p on node ~p, result: ~p~n", [M,F,length(A),Node,Result])
     end,

@@ -47,7 +47,8 @@ make_master_index1([Dir|Rest], Result) ->
     NewResult = 
 	case catch read_variables(Dir) of
 	    {'EXIT',{{bad_installation,Reason},_}} ->
-		io:put_chars("Failed to read " ++ filename:join(Dir,?variables)++
+		io:put_chars(standard_error,
+			     "Failed to read " ++ filename:join(Dir,?variables)++
 			     ": " ++ Reason ++ " - Ignoring this directory\n"),
 		Result;
 	    Vars ->
@@ -154,18 +155,19 @@ make_index(Dir, Vars, IncludeLast) ->
     io:put_chars("Updating " ++ IndexName ++ "... "),
     case catch make_index1(Dir, IndexName, Vars, IncludeLast) of
 	{'EXIT', Reason} ->
-	    io:put_chars("CRASHED!\n"),
-	    io:format("~p~n", [Reason]),
+	    io:put_chars(standard_error, "CRASHED!\n"),
+	    io:format(standard_error, "~p~n", [Reason]),
 	    {error, Reason};
 	{error, Reason} ->
-	    io:put_chars("FAILED\n"),
-	    io:format("~p~n", [Reason]),
+	    io:put_chars(standard_error, "FAILED\n"),
+	    io:format(standard_error, "~p~n", [Reason]),
 	    {error, Reason};
 	{ok, Summary} ->
 	    io:put_chars("done\n"),
 	    {ok, Summary};
 	Err ->
-	    io:format("Unknown internal error. Please report.\n(Err: ~p, ID: 1)",
+	    io:format(standard_error,
+		      "Unknown internal error. Please report.\n(Err: ~p, ID: 1)",
 		      [Err]),
 	    {error, Err}
     end.

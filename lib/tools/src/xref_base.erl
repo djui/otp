@@ -1506,7 +1506,8 @@ do_variables(State) ->
 		      _Else -> {[Name | P], U}
 		  end;
 	     ({{tmp, V}, _}, A) ->
-		  io:format("Bug in ~p: temporary ~p~n", [?MODULE, V]), A;
+		  io:format(standard_error, "Bug in ~p: temporary ~p~n", [?MODULE, V]),
+		  A;
 	     (_V, A) -> A
 	  end,
     {U,P} = foldl(Fun, {[],[]}, dict:to_list(State#xref.variables)),
@@ -1772,9 +1773,9 @@ message(true, What, Arg) ->
 	no_debug_info ->
 	    io:format("Skipping ~s (no debug information)~n", Arg);
 	unresolved_summary1 ->
-	    io:format("~p: 1 unresolved call~n", Arg);
+	    io:format(standard_error, "~p: 1 unresolved call~n", Arg);
 	unresolved_summary ->
-	    io:format("~p: ~p unresolved calls~n", Arg);
+	    io:format(standard_error, "~p: ~p unresolved calls~n", Arg);
 	jam ->
 	    io:format("Skipping ~s (probably JAM file)~n", [Arg]);
 	unreadable ->
@@ -1792,9 +1793,9 @@ message(true, What, Arg) ->
 	done ->
 	    io:format("done~n", Arg);
 	error ->
-	    io:format("error~n", Arg);
+	    io:format(standard_error, "error~n", Arg);
 	Else ->
-	    io:format("~p~n", [{Else,Arg}])
+	    io:format(standard_error, "~p~n", [{Else,Arg}])
     end;
 message(_, _, _) ->
     true.

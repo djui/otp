@@ -339,7 +339,7 @@ parse_cmd_line(['SPEC',Spec|Cmds], SpecList, Names, Param, Trc, Cov, TCCB) ->
 	    parse_cmd_line(Cmds, TermList++SpecList, [Name|Names], Param,
 			   Trc, Cov, TCCB);
 	{error,Reason} ->
-	    io:format("Can't open ~s: ~p\n",
+	    io:format(standard_error, "Can't open ~s: ~p\n",
 		      [cast_to_list(Spec), file:format_error(Reason)]),
 	    parse_cmd_line(Cmds, SpecList, Names, Param, Trc, Cov, TCCB)
     end;
@@ -370,9 +370,9 @@ parse_cmd_line(['COVER',App,CF,Analyse|Cmds], SpecList, Names, Param, Trc, _Cov,
 parse_cmd_line(['TESTCASE_CALLBACK',Mod,Func|Cmds], SpecList, Names, Param, Trc, Cov, _) ->
     parse_cmd_line(Cmds, SpecList, Names, Param, Trc, Cov, {Mod,Func});
 parse_cmd_line([Obj|_Cmds], _SpecList, _Names, _Param, _Trc, _Cov, _TCCB) ->
-    io:format("~p: Bad argument: ~p\n", [?MODULE,Obj]),
-    io:format(" Use the `ts' module to start tests.\n", []),
-    io:format(" (If you ARE using `ts', there is a bug in `ts'.)\n", []),
+    io:format(standard_error, "~p: Bad argument: ~p\n", [?MODULE,Obj]),
+    io:format(standard_error, " Use the `ts' module to start tests.\n", []),
+    io:format(standard_error, " (If you ARE using `ts', there is a bug in `ts'.)\n", []),
     halt(1);
 parse_cmd_line([], SpecList, Names, Param, Trc, Cov, TCCB) ->
     NameList = lists:reverse(Names, [suite]),
@@ -1207,9 +1207,9 @@ handle_info({'EXIT',Pid,Reason}, State) ->
 		normal ->
 		    fine;
 		killed ->
-		    io:format("Suite ~s was killed\n", [Name]);
+		    io:format(standard_error, "Suite ~s was killed\n", [Name]);
 		_Other ->
-		    io:format("Suite ~s was killed with reason ~p\n",
+		    io:format(standard_error, "Suite ~s was killed with reason ~p\n",
 			      [Name,Reason])
 	    end,
 	    State2 = State#state{jobs=NewJobs},
@@ -1253,7 +1253,8 @@ handle_info({tcp,_MainSock,<<1,Request/binary>>}, State) ->
 	    %% The local job proc will soon be killed by the closed socket or
 	    %% because the job is finished. Then the above clause ('EXIT') will
 	    %% handle the problem.
-	    io:format("Suite ~s was killed on remote target with reason"
+	    io:format(standard_error,
+		      "Suite ~s was killed on remote target with reason"
 		      " ~p\n", [Name,Reason]);
 	_ ->
 	    ignore
@@ -1454,7 +1455,7 @@ do_spec(SpecName, TimetrapSpec) when is_list(SpecName) ->
 	{ok,TermList} ->
 	    do_spec_list(TermList,TimetrapSpec);
 	{error,Reason} ->
-	    io:format("Can't open ~s: ~p\n", [SpecName,Reason]),
+	    io:format(standard_error, "Can't open ~s: ~p\n", [SpecName,Reason]),
 	    {error,{cant_open_spec,Reason}}
     end.
 
@@ -1537,7 +1538,7 @@ do_spec_terms([{require_nodenames,NumNames}|Terms], TopCases, SkipList, Config) 
     do_spec_terms(Terms, TopCases, SkipList,
 		  update_config(Config, {nodenames,NodeNames}));
 do_spec_terms([Other|Terms], TopCases, SkipList, Config) ->
-    io:format("** WARNING: Spec file contains unknown directive ~p\n",
+    io:format(standard_error, "** WARNING: Spec file contains unknown directive ~p\n",
 	      [Other]),
     do_spec_terms(Terms, TopCases, SkipList, Config).
 
@@ -2087,7 +2088,7 @@ copy_html_file(Src, DestDir) ->
 	{ok,Bin} ->
 	    ok = file:write_file(Dest, Bin);
 	{error,_Reason} ->
-	    io:format("File ~p: read failed\n", [Src])
+	    io:format(standard_error, "File ~p: read failed\n", [Src])
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3842,7 +3843,7 @@ maybe_send_beam_and_datadir(Mod) ->
 send_beam_and_datadir(Mod, JobSock) ->
     case code:which(Mod) of
 	non_existing ->
-	    io:format("** WARNING: Suite ~w could not be found on host\n",
+	    io:format(standard_error, "** WARNING: Suite ~w could not be found on host\n",
 		      [Mod]);
 	BeamFile ->
 	    send_beam(JobSock, Mod, BeamFile)
@@ -4863,7 +4864,7 @@ collect_files(Dir, Pattern, St) ->
     Wc = filename:join([Dir1,Pattern++code:objfile_extension()]),
     case catch filelib:wildcard(Wc) of
 	{'EXIT', Reason} ->
-	    io:format("Could not collect files: ~p~n", [Reason]),
+	    io:format(standard_error, "Could not collect files: ~p~n", [Reason]),
 	    {error,{collect_fail,Dir,Pattern}};
 	Mods0 ->
 	    Mods = [{path_to_module(Mod),all} || Mod <- lists:sort(Mods0)],
@@ -5547,7 +5548,8 @@ write_coverlog_header(CoverLog) ->
 		  "link=\"blue\" vlink=\"purple\" alink=\"red\">",
 		  [?MODULE]) of
 	{'EXIT',Reason} ->
-	    io:format("\n\nERROR: Could not write normal heading in coverlog.\n"
+	    io:format(standard_error,
+		      "\n\nERROR: Could not write normal heading in coverlog.\n"
 		      "CoverLog: ~w\n"
 		      "Reason: ~p\n",
 		      [CoverLog,Reason]),

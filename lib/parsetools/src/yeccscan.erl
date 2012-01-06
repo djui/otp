@@ -37,7 +37,8 @@ scan(Inport, Prompt, Line1) ->
 	{error, Descriptor, Line2} ->
 	    {error, Descriptor, Line2};
 	{'EXIT', Why} ->
-	    io:format('yeccscan: Error scanning input line ~w~n', [Line1]),
+	    io:format(standard_error,
+		    'yeccscan: Error scanning input line ~w~n', [Line1]),
 	    exit(Why)
     end.
 

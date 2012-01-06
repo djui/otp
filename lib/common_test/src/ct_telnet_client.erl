@@ -310,7 +310,7 @@ cmd_dbg(_Cmd) ->
 		end,
 	    io:format("~s(~w): ~w\n", [CtrlStr,Ctrl,Opts1]);
 	Any  ->
-	    io:format("Unexpected in cmd_dbg:~n~w~n",[Any])
+	    io:format(standard_error, "Unexpected in cmd_dbg:~n~w~n",[Any])
     end.
 
 -else.

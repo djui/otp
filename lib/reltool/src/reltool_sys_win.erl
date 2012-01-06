@@ -175,12 +175,13 @@ do_init([{safe_config, Safe}, {parent, Parent} | Options]) ->
 		    restart_server_safe_config(Safe,Parent,Reason)
 	    end;
 	{error, Reason} ->
-	    io:format("~p(~p): <ERROR> ~p\n", [?MODULE, ?LINE, Reason]),
+	    io:format(standard_error, "~p(~p): <ERROR> ~p\n",
+		    [?MODULE, ?LINE, Reason]),
 	    exit(Reason)
     end.
 
 restart_server_safe_config(true,_Parent,Reason) ->
-    io:format("~p(~p): <ERROR> ~p\n", [?MODULE, ?LINE, Reason]),
+    io:format(standard_error, "~p(~p): <ERROR> ~p\n", [?MODULE, ?LINE, Reason]),
     exit(Reason);
 restart_server_safe_config(false,Parent,Reason) ->
     Strings =
@@ -196,7 +197,8 @@ restart_server_safe_config(false,Parent,Reason) ->
 	?wxID_OK ->
 	    do_init([{safe_config,true},{parent,Parent},?safe_config]);
 	?wxID_CANCEL ->
-	    io:format("~p(~p): <ERROR> ~p\n", [?MODULE, ?LINE, Reason]),
+	    io:format(standard_error, "~p(~p): <ERROR> ~p\n",
+		    [?MODULE, ?LINE, Reason]),
 	    exit(Reason)
     end.
 
@@ -209,7 +211,8 @@ exit_dialog(Warnings) ->
         ?wxID_OK ->
 	    ok;
         ?wxID_CANCEL  ->
-	    io:format("~p(~p): <ERROR> ~s\n", [?MODULE, ?LINE, Details]),
+	    io:format(standard_error, "~p(~p): <ERROR> ~s\n",
+		    [?MODULE, ?LINE, Details]),
 	    exit(Details)
     end.
 

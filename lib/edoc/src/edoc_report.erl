@@ -33,6 +33,9 @@
 	 report/2,
 	 report/3,
 	 report/4,
+	 report_error/2,
+	 report_error/3,
+	 report_error/4,
 	 warning/1,
 	 warning/2,
 	 warning/3,
@@ -48,11 +51,11 @@ error(Where, What) ->
     error(0, Where, What).
 
 error(Line, Where, S) when is_list(S) ->
-    report(Line, Where, S, []);
+    report_error(Line, Where, S, []);
 error(Line, Where, {S, D}) when is_list(S) ->
-    report(Line, Where, S, D);
+    report_error(Line, Where, S, D);
 error(Line, Where, {format_error, M, D}) ->
-    report(Line, Where, M:format_error(D), []).
+    report_error(Line, Where, M:format_error(D), []).
 
 warning(S) ->
     warning(S, []).
@@ -64,7 +67,7 @@ warning(Where, S, Vs) ->
     warning(0, Where, S, Vs).
 
 warning(L, Where, S, Vs) ->
-    report(L, Where, "warning: " ++ S, Vs).
+    report_error(L, Where, "warning: " ++ S, Vs).
 
 report(S, Vs) ->
     report([], S, Vs).
@@ -81,6 +84,22 @@ report(L, Where, S, Vs) ->
     end,
     io:fwrite(S, Vs),
     io:nl().
+
+report_error(S, Vs) ->
+    report_error([], S, Vs).
+
+report_error(Where, S, Vs) ->
+    report_error(0, Where, S, Vs).
+
+report_error(L, Where, S, Vs) ->
+    io:put_chars(standard_error, where(Where)),
+    if is_integer(L), L > 0 ->
+	    io:fwrite(standard_error, "at line ~w: ", [L]);
+       true ->
+	    ok
+    end,
+    io:fwrite(standard_error, S, Vs),
+    io:nl(standard_error).
 
 where({File, module}) ->
     io_lib:fwrite("~s, in module header: ", [File]);

@@ -126,7 +126,7 @@ close(Info, StartDir) ->
 		ok ->
 		    ok;
 		Error ->
-		    io:format("Warning! Cleanup failed: ~p~n", [Error])
+		    io:format(standard_error, "Warning! Cleanup failed: ~p~n", [Error])
 	    end,
 	    make_all_suites_index(stop),
 	    make_all_runs_index(stop);
@@ -787,18 +787,20 @@ make_last_run_index(StartTime) ->
     AbsIndexName = ?abs(IndexName),
     case catch make_last_run_index1(StartTime,IndexName) of
 	{'EXIT', Reason} ->
-	    io:put_chars("CRASHED while updating " ++ AbsIndexName ++ "!\n"),
-	    io:format("~p~n", [Reason]),
+	    io:put_chars(standard_error,
+	                 "CRASHED while updating " ++ AbsIndexName ++ "!\n"),
+	    io:format(standard_error, "~p~n", [Reason]),
 	    {error, Reason};
 	{error, Reason} ->
-	    io:put_chars("FAILED while updating " ++ AbsIndexName ++ "\n"),
-	    io:format("~p~n", [Reason]),
+	    io:put_chars(standard_error,
+	                 "FAILED while updating " ++ AbsIndexName ++ "\n"),
+	    io:format(standard_error, "~p~n", [Reason]),
 	    {error, Reason};
 	ok ->
 %	    io:put_chars("done\n"),
 	    ok;
 	Err ->
-	    io:format("Unknown internal error while updating ~s. "
+	    io:format(standard_error, "Unknown internal error while updating ~s. "
 		      "Please report.\n(Err: ~p, ID: 1)",
 		      [AbsIndexName,Err]),
 	    {error, Err}
@@ -1264,7 +1266,8 @@ count_cases(Dir) ->
 			    Summary
 		    end;
 		{error, _Reason} ->
-		    io:format("\nFailed to read ~p (skipped)\n", [LogFile]),
+		    io:format(standard_error,
+			    "\nFailed to read ~p (skipped)\n", [LogFile]),
 		    error
 	    end
     end.
@@ -1612,17 +1615,19 @@ make_all_suites_index(NewTestData = {_TestName,DirName}) ->
 					     Label,
 					     LogDirData) of
 	    {'EXIT',Reason} ->
-		io:put_chars("CRASHED while updating " ++ AbsIndexName ++ "!\n"),
-		io:format("~p~n", [Reason]),
+		io:put_chars(standard_error,
+		             "CRASHED while updating " ++ AbsIndexName ++ "!\n"),
+		io:format(standard_error, "~p~n", [Reason]),
 		{error,Reason};
 	    {error,Reason} ->
-		io:put_chars("FAILED while updating " ++ AbsIndexName ++ "\n"),
-		io:format("~p~n", [Reason]),
+		io:put_chars(standard_error,
+		             "FAILED while updating " ++ AbsIndexName ++ "\n"),
+		io:format(standard_error, "~p~n", [Reason]),
 		{error,Reason};
 	    ok ->
 		ok;
 	    Err ->
-		io:format("Unknown internal error while updating ~s. "
+		io:format(standard_error, "Unknown internal error while updating ~s. "
 			  "Please report.\n(Err: ~p, ID: 1)",
 			  [AbsIndexName,Err]),
 		{error, Err}
@@ -1662,12 +1667,14 @@ make_all_suites_index1(When, AbsIndexName, AllLogDirs) ->
     end,
     case catch make_all_suites_index2(IndexName, AllLogDirs) of
 	{'EXIT', Reason} ->
-	    io:put_chars("CRASHED while updating " ++ AbsIndexName ++ "!\n"),
-	    io:format("~p~n", [Reason]),
+	    io:put_chars(standard_error,
+		             "CRASHED while updating " ++ AbsIndexName ++ "!\n"),
+	    io:format(standard_error, "~p~n", [Reason]),
 	    {error, Reason};
 	{error, Reason} ->
-	    io:put_chars("FAILED while updating " ++ AbsIndexName ++ "\n"),
-	    io:format("~p~n", [Reason]),
+	    io:put_chars(standard_error,
+		             "FAILED while updating " ++ AbsIndexName ++ "\n"),
+	    io:format(standard_error, "~p~n", [Reason]),
 	    {error, Reason};
 	{ok,CacheData} ->
 	    case When of
@@ -1680,7 +1687,7 @@ make_all_suites_index1(When, AbsIndexName, AllLogDirs) ->
 		    ok
 	    end;
 	Err ->
-	    io:format("Unknown internal error while updating ~s. "
+	    io:format(standard_error, "Unknown internal error while updating ~s. "
 		      "Please report.\n(Err: ~p, ID: 1)",
 		      [AbsIndexName,Err]),
 	    {error, Err}

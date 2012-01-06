@@ -1065,7 +1065,7 @@ calc_inherit_body(G, N, OrigBody, [X|Xs], InhBody) ->
 	    Body = filter_body(G, X, ic_forms:get_body(Intf), N, OrigBody, InhBody),
 	    calc_inherit_body(G, N, OrigBody, Xs, [{X, Body} | InhBody]);
 	XXX ->
-	    io:format("Oops, not found ~p~n", [XXX]),
+	    io:format(standard_error, "Oops, not found ~p~n", [XXX]),
 	    calc_inherit_body(G, N, OrigBody, Xs, InhBody)
     end;
 calc_inherit_body(_G, _N, _OrigBody, [], InhBody) -> lists:reverse(InhBody).

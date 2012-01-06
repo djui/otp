@@ -276,16 +276,16 @@ start(EscriptOptions) ->
             [File|Args] ->
                 parse_and_run(File, Args, EscriptOptions);
             [] ->
-                io:format("escript: Missing filename\n", []),
+                io:format(standard_error, "escript: Missing filename\n", []),
                 my_halt(127)
         end
     catch
         throw:Str ->
-            io:format("escript: ~s\n", [Str]),
+            io:format(standard_error, "escript: ~s\n", [Str]),
             my_halt(127);
         _:Reason ->
-            io:format("escript: Internal error: ~p\n", [Reason]),
-            io:format("~p\n", [erlang:get_stacktrace()]),
+            io:format(standard_error, "escript: Internal error: ~p\n", [Reason]),
+            io:format(standard_error, "~p\n", [erlang:get_stacktrace()]),
             my_halt(127)
     end.
 
@@ -610,7 +610,7 @@ parse_source(S, File, Fd, StartLine, HeaderSz, CheckOnly) ->
             ok = file:close(Fd),
 	    check_source(S3, CheckOnly);
 	{error, Reason} ->
-	    io:format("escript: ~p\n", [Reason]),
+	    io:format(standard_error, "escript: ~p\n", [Reason]),
 	    fatal("Preprocessor error")
     end.
 
@@ -680,7 +680,7 @@ epp_parse_file2(Epp, S, Forms, Parsed) ->
                             epp_parse_file(Epp, S2, [Form | Forms]);
                         true ->
                             Args = lists:flatten(io_lib:format("illegal mode attribute: ~p", [NewMode])),
-                            io:format("~s:~w ~s\n", [S#state.file,Ln,Args]),
+                            io:format(standard_error, "~s:~w ~s\n", [S#state.file,Ln,Args]),
                             Error = {error,{Ln,erl_parse,Args}},
                             Nerrs= S#state.n_errors + 1,
                             epp_parse_file(Epp, S2#state{n_errors = Nerrs}, [Error | Forms])
@@ -696,7 +696,7 @@ epp_parse_file2(Epp, S, Forms, Parsed) ->
                     epp_parse_file(Epp, S, [Form | Forms])
             end;
         {error,{Ln,Mod,Args}} = Form ->
-            io:format("~s:~w: ~s\n",
+            io:format(standard_error, "~s:~w: ~s\n",
                       [S#state.file,Ln,Mod:format_error(Args)]),
             epp_parse_file(Epp, S#state{n_errors = S#state.n_errors + 1}, [Form | Forms]);
         {eof, _LastLine} = Eof ->
@@ -766,10 +766,10 @@ report_errors(Errors) ->
                   Errors).
 
 list_errors(F, [{Line,Mod,E}|Es]) ->
-    io:fwrite("~s:~w: ~s\n", [F,Line,Mod:format_error(E)]),
+    io:fwrite(standard_error, "~s:~w: ~s\n", [F,Line,Mod:format_error(E)]),
     list_errors(F, Es);
 list_errors(F, [{Mod,E}|Es]) ->
-    io:fwrite("~s: ~s\n", [F,Mod:format_error(E)]),
+    io:fwrite(standard_error, "~s: ~s\n", [F,Mod:format_error(E)]),
     list_errors(F, Es);
 list_errors(_F, []) -> ok.
 
@@ -778,7 +778,7 @@ report_warnings(Ws0) ->
                            ({F,Eds}) -> format_message(F, Eds) end,
                   Ws0),
     Ws = ordsets:from_list(Ws1),
-    lists:foreach(fun({_,Str}) -> io:put_chars(Str) end, Ws).
+    lists:foreach(fun({_,Str}) -> io:put_chars(standard_error, Str) end, Ws).
 
 format_message(F, [{Line,Mod,E}|Es]) ->
     M = {{F,Line},io_lib:format("~s:~w: Warning: ~s\n", [F,Line,Mod:format_error(E)])},
@@ -823,7 +823,7 @@ code_handler(Name, Args, Dict, File) ->
                     %% io:format("Calling:~p~n",[{Mod,Name,Args}]),
                     apply(Mod, Name, Args);
                 error ->
-                    io:format("Script does not export ~w/~w\n", [Name,Arity]),
+                    io:format(standard_error, "Script does not export ~w/~w\n", [Name,Arity]),
                     my_halt(127)
             end
     end.

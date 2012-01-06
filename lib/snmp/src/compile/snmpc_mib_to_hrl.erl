@@ -337,7 +337,7 @@ compile(Input, Output, Opts) ->
 	ok ->
 	    ok;
 	{error, Reason} ->
-	    io:format("~p", [Reason]),
+	    io:format(standard_error, "~p", [Reason]),
 	    error
     end.
 

@@ -71,11 +71,11 @@ pragma_reg(G,X) ->
 	    %% Just print the number of errors found
 	    case ErrorNr > 1 of
 		true ->
-		    io:format("There were ~p errors found on file ~p~n",
+		    io:format(standard_error, "There were ~p errors found on file ~p~n",
 			      [ErrorNr,get_idlfile(S)]),
 		    error;
 		false ->
-		    io:format("There were ~p error found on file ~p~n",
+		    io:format(standard_error, "There were ~p error found on file ~p~n",
 			      [ErrorNr,get_idlfile(S)]),
 		    error
 	    end 
@@ -218,8 +218,8 @@ pragma_reg(G, S, N, X)  when element(1, X) == pragma ->
 		    pragma_reg_codeOpt(G,S,N,X);
 		
 		{pragma,{_,LineNr,BadPragma}, _To, _Apply} ->
-		    io:format("Warning : on file ~p :~n",[get_idlfile(S)]),
-		    io:format("  Unknown pragma directive ~p on line ~p, ignored.~n",
+		    io:format(standard_error, "Warning : on file ~p :~n",[get_idlfile(S)]),
+		    io:format(standard_error, "  Unknown pragma directive ~p on line ~p, ignored.~n",
 			      [BadPragma,LineNr])
 	    end;
 
@@ -346,17 +346,17 @@ pragma_reg_ID(G, S, N, X) ->
 		    insert(S,{id,X,LineNr,N,File,Type});
 		false ->
 		    set_compilation_failure(S),
-		    io:format("Error on file ~p :~n",[get_idlfile(S)]),
-		    io:format("  Bad pragma ID ~p on line ~p,~n",
+		    io:format(standard_error, "Error on file ~p :~n",[get_idlfile(S)]),
+		    io:format(standard_error, "  Bad pragma ID ~p on line ~p,~n",
 			      [element(3,Apply),LineNr]),
-		    io:format("  the version part of ID is not a short integer.~n")
+		    io:format(standard_error, "  the version part of ID is not a short integer.~n")
 	    end;
 	["LOCAL"|_] ->
 	    insert(S,{id,X,LineNr,N,File,Type});
 	_ ->
 	    set_compilation_failure(S),
-	    io:format("Error on file ~p :~n",[get_idlfile(S)]),
-	    io:format("  Bad pragma ID ~p on line ~p.~n",
+	    io:format(standard_error, "Error on file ~p :~n",[get_idlfile(S)]),
+	    io:format(standard_error, "  Bad pragma ID ~p on line ~p.~n",
 		      [element(3,Apply),LineNr])
     end.
 
@@ -380,17 +380,17 @@ pragma_reg_version(G, S, N, X) ->
 		    insert(S,{version,X,LineNr,N,File,Type});
 		false ->
 		    set_compilation_failure(S),
-		    io:format("Error on file ~p :~n",[get_idlfile(S)]),
-		    io:format("  Bad pragma version ~p on line ~p,~n",
+		    io:format(standard_error, "Error on file ~p :~n",[get_idlfile(S)]),
+		    io:format(standard_error, "  Bad pragma version ~p on line ~p,~n",
 			      [Apply,LineNr]),
-		    io:format("  the version is not valid.~n")
+		    io:format(standard_error, "  the version is not valid.~n")
 	    end;
 	_ ->
 	    set_compilation_failure(S),
-	    io:format("Error on file ~p :~n",[get_idlfile(S)]),
-	    io:format("  Bad pragma version ~p on line ~p,~n",
+	    io:format(standard_error, "Error on file ~p :~n",[get_idlfile(S)]),
+	    io:format(standard_error, "  Bad pragma version ~p on line ~p,~n",
 		      [Apply,LineNr]),
-	    io:format("  the version is not valid.~n")
+	    io:format(standard_error, "  the version is not valid.~n")
     end.
 
 
@@ -466,8 +466,8 @@ applyCodeOpts(G,S,LNr,[X|Xs]) ->
 	    applyCodeOpts(G,S,LNr,Xs);
 	false ->
 	    %% Print warning and continue
-	    io:format("Warning on file ~p :~n",[get_idlfile(S)]),
-	    io:format("  Bad option in pragma : ~p, ignored !~n",[X]),
+	    io:format(standard_error, "Warning on file ~p :~n",[get_idlfile(S)]),
+	    io:format(standard_error, "  Bad option in pragma : ~p, ignored !~n",[X]),
 	    applyCodeOpts(G,S,LNr,Xs)
     end.
 

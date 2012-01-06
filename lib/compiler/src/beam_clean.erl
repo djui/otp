@@ -181,7 +181,8 @@ function_replace([{function,Name,Arity,Entry,Asm0}|Fs], Dict, Acc) ->
 	      replace(Asm0, [], Dict)
 	  catch
 	      throw:{error,{undefined_label,Lbl}=Reason} ->
-		  io:format("Function ~s/~w refers to undefined label ~w\n",
+		  io:format(standard_error,
+			    "Function ~s/~w refers to undefined label ~w\n",
 			    [Name,Arity,Lbl]),
 		  exit(Reason)
 	  end,

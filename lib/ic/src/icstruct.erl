@@ -62,7 +62,8 @@ except_gen(G, N, X, L) when is_record(X, except) ->
     N2 = [ic_forms:get_id2(X) | N],
     if
 	L == c ->
-	    io:format("Warning : Exception not defined for c mapping\n", []);
+	    io:format(standard_error,
+		    "Warning : Exception not defined for c mapping\n", []);
 	true ->
 	    emit_struct(G, N, X, L)
     end,

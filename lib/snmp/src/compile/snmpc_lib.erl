@@ -482,8 +482,8 @@ is_consistent(Filenames) ->
 	ok -> 
 	    ok;
 	{undef, Format, Data} ->
-	    ok = io:format(Format, Data),
-	    io:format("~n"),
+	    ok = io:format(standard_error, Format, Data),
+	    io:format(standard_error, "~n"),
 	    {error, inconsistent}
     end.
     
@@ -1754,14 +1754,15 @@ error(FormatStr, Data, Line) when is_list(FormatStr) ->
     exit(error).
 
 print_error(FormatStr, Data) when is_list(FormatStr) ->
-    ok = io:format("~s: " ++ FormatStr,[get(filename)|Data]),
+    ok = io:format(standard_error, "~s: " ++ FormatStr,[get(filename)|Data]),
     put(errors,yes),
-    io:format("~n").
+    io:format(standard_error, "~n").
     
 print_error(FormatStr, Data,Line) when is_list(FormatStr) ->
-    ok = io:format("~s: ~w: " ++ FormatStr,[get(filename), Line |Data]),
+    ok = io:format(standard_error, "~s: ~w: " ++ FormatStr,
+                   [get(filename), Line |Data]),
     put(errors,yes),
-    io:format("~n").
+    io:format(standard_error, "~n").
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -595,9 +595,9 @@ print_error({'EXIT', Err}) ->
     print_error(Err);
 print_error({error, Mod, Error}) ->
     S = apply(Mod, format_error, [Error]),
-    io:format(S, []);
+    io:format(standard_error, S, []);
 print_error(Other) ->
-    io:format("Error: ~p~n", [Other]).
+    io:format(standard_error, "Error: ~p~n", [Other]).
 
 format_error({file_problem, {"relup", _Posix}}) ->
     io_lib:format("Could not open file relup~n", []);
@@ -612,7 +612,7 @@ format_error({missing_sasl,Release}) ->
     io_lib:format("No sasl application in release ~p, ~p. Can not be upgraded.",
 		  [Release#release.name, Release#release.vsn]);
 format_error(Error) ->
-    io:format("~p~n", [Error]).
+    io:format(standard_error, "~p~n", [Error]).
 
 
 print_warnings(Ws, Opts) when is_list(Ws) ->
@@ -628,7 +628,7 @@ print_warning(W, Opts) ->
 		     "*WARNING* "
 	     end,
     S = format_warning(Prefix, W),
-    io:format("~s", [S]).
+    io:format(standard_error, "~s", [S]).
 
 format_warning(W) ->
     format_warning("*WARNING* ", W).

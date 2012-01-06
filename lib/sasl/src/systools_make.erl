@@ -156,10 +156,10 @@ return(ok,Warnings,Flags) ->
 	_ ->
 	    case member(warnings_as_errors,Flags) of
 		true ->
-		    io:format("~s",[format_warning(Warnings, true)]),
+		    io:format(standard_error,"~s",[format_warning(Warnings, true)]),
 		    error;
 		false ->
-		    io:format("~s",[format_warning(Warnings)]),
+		    io:format(standard_error,"~s",[format_warning(Warnings)]),
 		    ok
 	    end
     end;
@@ -168,7 +168,7 @@ return({error,Mod,Error},_,Flags) ->
 	true ->
 	    {error,Mod,Error};
 	_ ->
-	    io:format("~s",[Mod:format_error(Error)]),
+	    io:format(standard_error,"~s",[Mod:format_error(Error)]),
 	    error
     end.
 
@@ -903,7 +903,7 @@ check_modules(Appls, Path, TestP, Machine) ->
 		    Return
 	    end;
 	Dups ->
-%	    io:format("** ERROR Duplicate modules: ~p\n", [Dups]),
+%	    io:format(standard_error, "** ERROR Duplicate modules: ~p\n", [Dups]),
 	    throw({error, {duplicate_modules, Dups}})
     end.
 

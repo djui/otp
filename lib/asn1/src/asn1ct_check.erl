@@ -4241,7 +4241,7 @@ check_constraint(S,{simpletable,Type}) ->
 	    ObjSet = GetObjectSet(TorVDef),
 	    {simpletable,check_object(S,Type,ObjSet)};
 	#'ObjectSet'{} ->
-	    io:format("ALERT: simpletable forbidden case!~n",[]),
+	    io:format(standard_error, "ALERT: simpletable forbidden case!~n",[]),
 	    {simpletable,check_object(S,Type,C)};
 	{'ValueFromObject',{_,ORef},FieldName} ->
 	    %% This is an ObjectFromObject
@@ -7153,7 +7153,7 @@ findtypes_and_values([],Tacc,Vacc,Pacc,Cacc,Oacc,OSacc) ->
 
 error({export,Msg,#state{mname=Mname,type=Ref,tname=Typename}}) ->
     Pos = Ref#'Externaltypereference'.pos,
-    io:format("asn1error:~p:~p:~p~n~p~n",[Pos,Mname,Typename,Msg]),
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",[Pos,Mname,Typename,Msg]),
     {error,{export,Pos,Mname,Typename,Msg}};
 error({import,Msg,#state{mname=Mname,type=Ref,tname=Typename}}) ->
     PosOfDef =
@@ -7161,52 +7161,58 @@ error({import,Msg,#state{mname=Mname,type=Ref,tname=Typename}}) ->
 	   (#'Externalvaluereference'{pos=P}) -> P
 	end,
     Pos = PosOfDef(Ref),
-    io:format("asn1error:~p:~p:~p~n~p~n",[Pos,Mname,Typename,Msg]),
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",[Pos,Mname,Typename,Msg]),
     {error,{import,Pos,Mname,Typename,Msg}};
 % error({type,{Msg1,Msg2},#state{mname=Mname,type=Type,tname=Typename}}) 
 %   when is_record(Type,typedef) ->
-%     io:format("asn1error:~p:~p:~p ~p~n",
+%     io:format(standard_error, "asn1error:~p:~p:~p ~p~n",
 % 	      [Type#typedef.pos,Mname,Typename,Msg1]),
 %     {error,{type,Type#typedef.pos,Mname,Typename,Msg1,Msg2}};
 error({type,Msg,#state{mname=Mname,type=Type,tname=Typename}}) 
   when is_record(Type,type) ->
-    io:format("asn1error:~p:~p~n~p~n",
+    io:format(standard_error, "asn1error:~p:~p~n~p~n",
 	      [Mname,Typename,Msg]),
     {error,{type,Mname,Typename,Msg}};
 error({type,Msg,#state{mname=Mname,type=Type,tname=Typename}}) 
   when is_record(Type,typedef) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
 	      [Type#typedef.pos,Mname,Typename,Msg]),
     {error,{type,Type#typedef.pos,Mname,Typename,Msg}};
 error({type,Msg,#state{mname=Mname,type=Type,tname=Typename}}) 
   when is_record(Type,ptypedef) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
 	      [Type#ptypedef.pos,Mname,Typename,Msg]),
     {error,{type,Type#ptypedef.pos,Mname,Typename,Msg}};
 error({type,Msg,#state{mname=Mname,value=Value,vname=Valuename}})
   when is_record(Value,valuedef) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",[Value#valuedef.pos,Mname,Valuename,Msg]),
+    io:format(standard_error,"asn1error:~p:~p:~p~n~p~n",
+              [Value#valuedef.pos,Mname,Valuename,Msg]),
     {error,{type,Value#valuedef.pos,Mname,Valuename,Msg}};
 error({type,Msg,#state{mname=Mname,type=Type,tname=Typename}}) 
   when is_record(Type,pobjectdef) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
 	      [Type#pobjectdef.pos,Mname,Typename,Msg]),
     {error,{type,Type#pobjectdef.pos,Mname,Typename,Msg}};
 error({value,Msg,#state{mname=Mname,value=Value,vname=Valuename}}) 
   when is_record(Value,valuedef) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",[Value#valuedef.pos,Mname,Valuename,Msg]),
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
+              [Value#valuedef.pos,Mname,Valuename,Msg]),
     {error,{value,Value#valuedef.pos,Mname,Valuename,Msg}};
 error({Other,Msg,#state{mname=Mname,value=#valuedef{pos=Pos},vname=Valuename}}) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",[Pos,Mname,Valuename,Msg]),
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
+              [Pos,Mname,Valuename,Msg]),
     {error,{Other,Pos,Mname,Valuename,Msg}};
 error({Other,Msg,#state{mname=Mname,type=#typedef{pos=Pos},tname=Typename}}) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",[Pos,Mname,Typename,Msg]),
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
+              [Pos,Mname,Typename,Msg]),
     {error,{Other,Pos,Mname,Typename,Msg}};
 error({Other,Msg,#state{mname=Mname,type=#classdef{pos=Pos},tname=Typename}}) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",[Pos,Mname,Typename,Msg]),
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
+              [Pos,Mname,Typename,Msg]),
     {error,{Other,Pos,Mname,Typename,Msg}};
 error({Other,Msg,#state{mname=Mname,type=Type,tname=Typename}}) ->
-    io:format("asn1error:~p:~p:~p~n~p~n",[asn1ct:get_pos_of_def(Type),Mname,Typename,Msg]),
+    io:format(standard_error, "asn1error:~p:~p:~p~n~p~n",
+              [asn1ct:get_pos_of_def(Type),Mname,Typename,Msg]),
     {error,{Other,asn1ct:get_pos_of_def(Type),Mname,Typename,Msg}}.
 
 include_default_type(Module) ->

@@ -552,7 +552,7 @@ fun_info(E, Env, S) ->
 	    %% io:fwrite("Got fun-info: ~w: {~w,~w}.\n", [Name,Id,H]),
 	    {#fun_info{name = Name, id = Id, hash = H}, S};
 	_ ->
-	    io:fwrite("Warning - fun not annotated: "
+	    io:fwrite(standard_error, "Warning - fun not annotated: "
 		      "making up new name.\n"), % for now
  	    {{Name,_Arity}, S1} = new_fun_name(E, Env, S),
  	    {#fun_info{name = Name, id = 0, hash = 0}, S1}

@@ -753,7 +753,8 @@ used_records(E) ->
     {expr, E}.
 
 fwrite_severity(Severity, S, As) ->
-    io:fwrite(<<"~s\n">>, [format_severity(Severity, S, As)]).
+    io:fwrite(output_stream(Severity), <<"~s\n">>,
+              [format_severity(Severity, S, As)]).
 
 format_severity(Severity, S, As) ->
     add_severity(Severity, io_lib:fwrite(S, As)).
@@ -764,6 +765,10 @@ add_severity(Severity, S) ->
 severity_tag(fatal)   -> <<"*** ">>;
 severity_tag(serious) -> <<"** ">>;
 severity_tag(benign)  -> <<"* ">>.
+
+output_stream(fatal)   -> standard_error;
+output_stream(serious) -> standard_error;
+output_stream(benign)  -> standard_io.
 
 restrict_handlers(RShMod, Shell, RT) ->
     { fun(F,As,Binds) -> 

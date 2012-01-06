@@ -298,10 +298,10 @@ pack_warnings([]) ->
 report_errors(St) ->
     when_opt(fun () -> 
                      foreach(fun({File,{none,Mod,E}}) -> 
-                                     io:fwrite("~s: ~s\n",
+                                     io:fwrite(standard_error, "~s: ~s\n",
                                                [File,Mod:format_error(E)]);
                                 ({File,{Line,Mod,E}}) -> 
-                                     io:fwrite("~s:~w: ~s\n",
+                                     io:fwrite(standard_error, "~s:~w: ~s\n",
                                                [File,Line,Mod:format_error(E)])
                              end, sort(St#leex.errors))
              end, report_errors, St#leex.opts).
@@ -316,11 +316,11 @@ report_warnings(St) ->
     ShouldReport = member(report_warnings, St#leex.opts) orelse ReportWerror,
     when_bool(fun () ->
 		      foreach(fun({File,{none,Mod,W}}) ->
-				      io:fwrite("~s: ~s~s\n",
+				      io:fwrite(standard_error, "~s: ~s~s\n",
 						[File,Prefix,
 						 Mod:format_error(W)]);
 				 ({File,{Line,Mod,W}}) ->
-				      io:fwrite("~s:~w: ~s~s\n",
+				      io:fwrite(standard_error, "~s:~w: ~s~s\n",
 						[File,Line,Prefix,
 						 Mod:format_error(W)])
 			      end, sort(St#leex.warnings))

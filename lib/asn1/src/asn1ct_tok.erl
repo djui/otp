@@ -44,7 +44,8 @@ process(L, Stream,Lno,R) when is_list(L) ->
     %%io:format('read:~s',[L]),
     case catch tokenise(Stream,L,Lno,[]) of
 	{'ERR',Reason} ->
-	    io:format("Tokeniser error on line: ~w ~w~n",[Lno,Reason]),
+	    io:format(standard_error,
+		    "Tokeniser error on line: ~w ~w~n",[Lno,Reason]),
 	    exit(0);
 	{NewLno,T} ->
 	    %%io:format('toks:~w~n',[T]),
@@ -249,7 +250,7 @@ skip_comment([_|T]) ->
 skip_multiline_comment(Stream,[],Lno,Level) ->
     case io:get_line(Stream,'') of
 	eof ->
-	    io:format("Tokeniser error on line: ~w~n"
+	    io:format(standard_error, "Tokeniser error on line: ~w~n"
 		      "premature end of multiline comment~n",[Lno]),
 	    exit(0);
 	Line ->

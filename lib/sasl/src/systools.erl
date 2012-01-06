@@ -72,7 +72,7 @@ make_tar(RelName, Opt) ->
 script2boot(File) ->
     case systools_lib:file_term2binary(File ++ ".script", File ++ ".boot") of
 	{error,Error} ->
-	    io:format(systools_make:format_error(Error)),
+	    io:format(standard_error, systools_make:format_error(Error)),
 	    error;
 	_ ->
 	    ok
@@ -83,7 +83,7 @@ script2boot(File, Output0, _Opt) ->
     Output = Output0++".boot",
     case systools_lib:file_term2binary(Input, Output) of
 	{error,Error} ->
-	    io:format(systools_make:format_error(Error)),
+	    io:format(standard_error, systools_make:format_error(Error)),
 	    error;
 	_ ->
 	    ok

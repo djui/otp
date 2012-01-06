@@ -140,16 +140,19 @@ script_start(Args) ->
 		    {'EXIT',Pid,Reason} ->
 			case Reason of
 			    {user_error,What} ->
-				io:format("\nTest run failed!\nReason: ~p\n\n", [What]),
+				io:format(standard_error,
+					  "\nTest run failed!\nReason: ~p\n\n", [What]),
 				{error,What};
 			    _ ->
-				io:format("Test run crashed! This could be an internal error "
+				io:format(standard_error, 
+					  "Test run crashed! This could be an internal error "
 					  "- please report!\n\n"
 					  "~p\n\n", [Reason]),
 				{error,Reason}				
 			end;
 		    {Pid,{error,Reason}} ->
-			io:format("\nTest run failed! Reason:\n~p\n\n",[Reason]),
+			io:format(standard_error,
+					  "\nTest run failed! Reason:\n~p\n\n",[Reason]),
 			{error,Reason};
 		    {Pid,Result} ->
 			Result
@@ -535,7 +538,7 @@ script_start4(#opts{vts = true, cover = Cover}, _) ->
 	    script_usage();
 	_ ->
 	    %% Add support later (maybe).
-	    io:format("\nCan't run cover in vts mode.\n\n", [])
+	    io:format(standard_error, "\nCan't run cover in vts mode.\n\n", [])
     end,
     erlang:halt();
 
@@ -545,7 +548,7 @@ script_start4(#opts{shell = true, cover = Cover}, _) ->
 	    script_usage();
 	_ ->
 	    %% Add support later (maybe).
-	    io:format("\nCan't run cover in interactive mode.\n\n", [])
+	    io:format(standard_error, "\nCan't run cover in interactive mode.\n\n", [])
     end;
 
 script_start4(Opts = #opts{tests = Tests}, Args) ->
@@ -649,13 +652,15 @@ install(Opts, LogDir) ->
 		    file:close(Fd),
 		    ok;
 		{error,Reason} ->
-		    io:format("CT failed to install configuration data. Please "
+		    io:format(standard_error,
+			      "CT failed to install configuration data. Please "
 			      "verify that the log directory exists and that "
 			      "write permission is set.\n\n", []),
 		    {error,{VarFile,Reason}}
 	    end;
 	_ ->
-	    io:format("It is not possible to install CT while running "
+	    io:format(standard_error,
+		      "It is not possible to install CT while running "
 		      "in interactive mode.\n"
 		      "To exit this mode, run ct:stop_interactive().\n"
 		      "To enter the interactive mode again, "
@@ -1721,7 +1726,7 @@ continue(_MakeErrors) ->
 		    R
 	    after 15000 ->
 		    exit(Pid, kill),
-		    io:format("... timeout - continuing!!\n"),
+		    io:format(standard_error, "... timeout - continuing!!\n"),
 		    true
 	    end;
 	false ->				% no shell process to use
@@ -2550,12 +2555,14 @@ start_trace(Args) ->
 			ok ->
 			    true;
 			{_,Error} ->
-			    io:format("Warning! Tracing not started. Reason: ~p~n~n",
+			    io:format(standard_error,
+				      "Warning! Tracing not started. Reason: ~p~n~n",
 				      [Error]),
 			    false
 		    end;
 		{_,Error} ->
-		    io:format("Warning! Tracing not started. Reason: ~s~n~n",
+		    io:format(standard_error,
+			      "Warning! Tracing not started. Reason: ~s~n~n",
 			      [file:format_error(Error)]),
 		    false
 	    end;

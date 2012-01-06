@@ -280,7 +280,7 @@ add_defaults(Mod,Func, GroupPath, DoInit) ->
 	    ErrStr = io_lib:format("~n*** ERROR *** "
 				   "~w:suite/0 failed: ~p~n",
 				   [Suite,Reason]),
-	    io:format(ErrStr, []),
+	    io:format(standard_error, ErrStr, []),
 	    io:format(user, ErrStr, []),
 	    {suite0_failed,{exited,Reason}};
 	SuiteInfo when is_list(SuiteInfo) ->
@@ -300,7 +300,7 @@ add_defaults(Mod,Func, GroupPath, DoInit) ->
 		    ErrStr = io_lib:format("~n*** ERROR *** "
 					   "Invalid return value from "
 					   "~w:suite/0: ~p~n", [Suite,SuiteInfo]),
-		    io:format(ErrStr, []),
+		    io:format(standard_error, ErrStr, []),
 		    io:format(user, ErrStr, []),
 		    {suite0_failed,bad_return_value}
 	    end;
@@ -308,7 +308,7 @@ add_defaults(Mod,Func, GroupPath, DoInit) ->
 	    ErrStr = io_lib:format("~n*** ERROR *** "
 				   "Invalid return value from "
 				   "~w:suite/0: ~p~n", [Suite,SuiteInfo]),
-	    io:format(ErrStr, []),
+	    io:format(standard_error, ErrStr, []),
 	    io:format(user, ErrStr, []),
 	    {suite0_failed,bad_return_value}
     end.

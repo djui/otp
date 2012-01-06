@@ -120,7 +120,8 @@ apply_fun(Pid, false, Fun) ->
 apply_fun(Pid, true, Fun) ->
     case get_status(Pid) of
 	{ok, Warnings} ->
-	    [io:format("~p: ~s\n", [?APPLICATION, W]) || W <- Warnings],
+	    [io:format(standard_error, "~p: ~s\n", [?APPLICATION, W])
+		    || W <- Warnings],
 	    apply_fun(Pid, false, Fun);
 	{error, _Reason} = Error ->
 	    stop(Pid),

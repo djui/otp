@@ -269,7 +269,7 @@ tricky_print_data(Port) ->
 		{ok,Names} ->
 		    case is_testnode_dead(Names) of
 			true ->
-			    io:put_chars("WARNING: No EOF, but "
+			    io:put_chars(standard_error, "WARNING: No EOF, but "
 					 "test_server node is down!\n");
 			false ->
 			    tricky_print_data(Port)
@@ -311,12 +311,12 @@ run_interactive(Vars, _Spec, State) ->
 start_xterm(Command) ->
     case os:find_executable("xterm") of
 	false ->
-	    io:format("The `xterm' program was not found.\n"),
+	    io:format(standard_error, "The `xterm' program was not found.\n"),
 	    {error, no_xterm};
 	_Xterm ->
 	    case os:getenv("DISPLAY") of
 		false ->
-		    io:format("DISPLAY is not set.\n"),
+		    io:format(standard_error, "DISPLAY is not set.\n"),
 		    {error, display_not_set};
 		Display ->
 		    io:format("Starting xterm (DISPLAY=~s)...\n",
@@ -350,7 +350,7 @@ make_common_test_args(Args0, Options, _Vars) ->
     Cover = 
 	case lists:keysearch(cover,1,Options) of
 	    {value,{cover, App, none, _Analyse}} ->
-		io:format("No cover file found for ~p~n",[App]),
+		io:format(standard_error, "No cover file found for ~p~n",[App]),
 		[];
 	    {value,{cover,_App,File,_Analyse}} -> 
 		[{cover,to_list(File)}];

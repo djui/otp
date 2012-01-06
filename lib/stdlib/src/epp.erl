@@ -345,7 +345,7 @@ wait_request(St) ->
 	{'EXIT',_,R} ->
 	    exit(R);
 	Other ->
-	    io:fwrite("Epp: unknown '~w'\n", [Other]),
+	    io:fwrite(standard_error, "Epp: unknown '~w'\n", [Other]),
 	    wait_request(St)
     end.
 

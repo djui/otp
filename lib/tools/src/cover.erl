@@ -585,7 +585,7 @@ main_process_loop(State) ->
 				  link(RPid),
 				  [Node|Acc];
 			      Error ->
-				  io:format("Could not start cover on ~w: ~p\n",
+				  io:format(standard_error, "Could not start cover on ~w: ~p\n",
 					    [Node,Error]),
 				  Acc
 			  end
@@ -857,7 +857,7 @@ remote_process_loop(State) ->
 	    remote_process_loop(State);
 
 	M ->
-	    io:format("WARNING: remote cover_server received\n~p\n",[M]),
+	    io:format(standard_error, "WARNING: remote cover_server received\n~p\n",[M]),
 	    case M of
 		{From,_} ->
 		    case is_from(From) of
@@ -1148,7 +1148,8 @@ add_imported(Module, File, ImportFile, Imported) ->
 add_imported(M, F1, ImportFile, [{M,_F2,ImportFiles}|Imported], Acc) ->
     case lists:member(ImportFile,ImportFiles) of
 	true ->
-	    io:fwrite("WARNING: Module ~w already imported from ~p~n"
+	    io:fwrite(standard_error,
+		      "WARNING: Module ~w already imported from ~p~n"
 		      "Not importing again!~n",[M,ImportFile]),
 	    dont_import;
 	false ->
@@ -1165,7 +1166,8 @@ add_imported(M, F, ImportFile, [], Acc) ->
 remove_imported(Module,Imported) ->
     case lists:keysearch(Module,1,Imported) of
 	{value,{Module,_,ImportFiles}} ->
-	    io:fwrite("WARNING: Deleting data for module ~w imported from~n"
+	    io:fwrite(standard_error,
+		      "WARNING: Deleting data for module ~w imported from~n"
 		      "~p~n",[Module,ImportFiles]),
 	    lists:keydelete(Module,1,Imported);
 	false ->

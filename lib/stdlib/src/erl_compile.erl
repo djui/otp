@@ -78,7 +78,7 @@ compile(List) ->
 	{'EXIT', Pid, {compiler_result, Result}} ->
 	    Result;
 	{'EXIT', Pid, Reason} ->
-	    io:format("Runtime error: ~p~n", [Reason]),
+	    io:format(standard_error, "Runtime error: ~p~n", [Reason]),
 	    error
     end.
 
@@ -152,7 +152,8 @@ compile2(Files, Cwd, Opts) ->
 	{[_|_], 1} ->
 	    compile3(Files, Cwd, Opts);
 	{[_|_], _N} ->
-	    io:format("Output file name given, but more than one input file.~n"),
+	    io:format(standard_error,
+	              "Output file name given, but more than one input file.~n"),
 	    error
     end.
 
@@ -180,24 +181,24 @@ compile3([], _Cwd, _Options) -> ok.
 %% Invokes the appropriate compiler, depending on the file extension.
 
 compile_file("", Input, _Output, _Options) ->
-    io:format("File has no extension: ~s~n", [Input]),
+    io:format(standard_error, "File has no extension: ~s~n", [Input]),
     error;
 compile_file(Ext, Input, Output, Options) ->
     case compiler(Ext) of
 	no ->
-	    io:format("Unknown extension: '~s'\n", [Ext]),
+	    io:format(standard_error, "Unknown extension: '~s'\n", [Ext]),
 	    error;
 	{M, F} ->
 	    case catch M:F(Input, Output, Options) of
 		ok -> ok;
 		error -> error;
 		{'EXIT',Reason} ->
-		    io:format("Compiler function ~w:~w/3 failed:\n~p~n",
+		    io:format(standard_error, "Compiler function ~w:~w/3 failed:\n~p~n",
 			      [M,F,Reason]),
 		    error;
 		Other ->
-		    io:format("Compiler function ~w:~w/3 returned:\n~p~n",
-			      [M,F,Other]),
+		    io:format(standard_error,
+		              "Compiler function ~w:~w/3 returned:\n~p~n", [M,F,Other]),
 		    error
 	    end
     end.
@@ -225,10 +226,10 @@ make_term(Str) ->
 	    case erl_parse:parse_term(Tokens ++ [{dot, 1}]) of
 		{ok, Term} -> Term;
 		{error, {_,_,Reason}} ->
-		    io:format("~s: ~s~n", [Reason, Str]),
+		    io:format(standard_error, "~s: ~s~n", [Reason, Str]),
 		    throw(error)
 	    end;
 	{error, {_,_,Reason}, _} ->
-	    io:format("~s: ~s~n", [Reason, Str]),
+	    io:format(standard_error, "~s: ~s~n", [Reason, Str]),
 	    throw(error)
     end.

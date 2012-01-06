@@ -1266,7 +1266,8 @@ strength_reduce(I, Op) ->
           case hipe_icode:is_const(Arg2) of
             true ->
               case hipe_icode:const_value(Arg2) of
-		  0 -> io:fwrite("Integer division by 0 detected!\n"), I;
+		  0 -> io:fwrite(standard_error,
+			 "Integer division by 0 detected!\n"), I;
 		  1 -> case call_dstlist(I) of
 			 [] -> remove_useless_arithmetic_instruction(I);
 			 [Dst] -> create_strength_reduce_move(I, Dst, Arg1)
@@ -1293,7 +1294,8 @@ strength_reduce(I, Op) ->
 	  case hipe_icode:is_const(Arg2) of
 	    true ->
 	      case hipe_icode:const_value(Arg2) of
-		  0 -> io:fwrite("Remainder with 0 detected!\n"), I;
+		  0 -> io:fwrite(standard_error,
+			 "Remainder with 0 detected!\n"), I;
 		  1 -> case call_dstlist(I) of
 			 [] -> remove_useless_arithmetic_instruction(I);
 			 [Dst] -> create_strength_reduce_move(

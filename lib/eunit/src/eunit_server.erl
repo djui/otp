@@ -325,8 +325,9 @@ auto_super(Server, M) ->
 	    ok
     after ?AUTO_TIMEOUT	->
 	    exit(Pid, kill),
-	    io:put_chars("\n== EUnit: automatic test was aborted ==\n"),
-	    io:put_chars("\n> ")
+	    io:put_chars(standard_error,
+	                 "\n== EUnit: automatic test was aborted ==\n"),
+	    io:put_chars(standard_error, "\n> ")
     end,
     Server ! {done, auto_test, self()}.
 

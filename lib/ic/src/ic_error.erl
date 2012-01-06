@@ -307,11 +307,11 @@ format_warn({warn, _, File, {WarnString, Line}}) ->
 
 %% Display an error or warning
 display(File, not_specified, F, A) ->
-    io:format("~p : ~s~n", [File, io_lib:format(F, A)]);
+    io:format(standard_error, "~p : ~s~n", [File, io_lib:format(F, A)]);
 display(File, Line, F, A) ->
-    io:format("~p on line ~p: ~s~n", [File, Line, io_lib:format(F, A)]).
+    io:format(standard_error, "~p on line ~p: ~s~n", [File, Line, io_lib:format(F, A)]).
 display(File, F, A) ->
-    io:format("~p: ~s~n", [File, io_lib:format(F, A)]).
+    io:format(standard_error, "~p: ~s~n", [File, io_lib:format(F, A)]).
 
 
 
@@ -319,7 +319,7 @@ display(File, F, A) ->
 %%    case {ic_options:get_opt(G, silent), ic_options:get_opt(G, silent2), 
 %%          ic_options:get_opt(G, nowarn)} of
 %%	{false, false, false} ->
-%%	    io:format("~p: warning: ~s~n", [ic_genobj:idlfile(G), WarnStr]);
+%%	    io:format(standard_error, "~p: warning: ~s~n", [ic_genobj:idlfile(G), WarnStr]);
 %%	_ -> ok
 %%    end.
 
@@ -327,7 +327,7 @@ display(File, F, A) ->
 %%    case {ic_options:get_opt(G, silent), ic_options:get_opt(G, silent2),
 %%          ic_options:get_opt(G, nowarn)} of
 %%	{false, false, false} ->
-%%	    io:format("~p on line ~p: warning: ~s~n", 
+%%	    io:format(standard_error, "~p on line ~p: warning: ~s~n", 
 %%		      [ic_genobj:idlfile(G), Line, WarnStr]);
 %%	_ -> ok
 %%    end.
