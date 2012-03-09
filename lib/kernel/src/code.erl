@@ -64,7 +64,8 @@
 	 where_is_file/1,
 	 where_is_file/2,
 	 set_primary_archive/3,
-	 clash/0]).
+     clash/0,
+	 get_clash/0]).
 
 -export_type([load_error_rsn/0, load_ret/0]).
 
@@ -496,23 +497,44 @@ set_primary_archive(ArchiveFile0, ArchiveBin, #file_info{} = FileInfo)
 -spec clash() -> 'ok'.
 
 clash() ->
+  {Errors, Clashes} = lists:partition(fun({error,_}) -> true;
+                                         (_) -> false
+                                      end, get_clash()),
+  if length(Errors) =:= 0 -> ok;
+     true ->
+      lists:foreach(fun({error, {bad_directory, Dir}}) ->
+                        io:format("** Bad path can't read ~s~n", [Dir])
+                    end, Errors)
+  end,
+  ClashesLen = length(Clashes),
+  if ClashesLen =:= 0 -> ok;
+     true ->
+      io:format("** Found ~w name clashes in code paths ~n", [ClashesLen]),
+      lists:foreach(fun({Path1, Path2}) ->
+                        io:format("** ~s hides ~s~n", [Path1, Path2])
+                    end, Clashes)
+  end.
+
+
+-spec get_clash() -> [tuple()].
+
+get_clash() ->
     Path = get_path(),
     Struct = lists:flatten(build(Path)),
-    Len = length(search(Struct)),
-    io:format("** Found ~w name clashes in code paths ~n", [Len]).
+    search(Struct).
 
-%% Internal for clash/0
+%% Internal for get_clash/0
 
 search([]) -> [];
+search([{error,_}=Err | Tail]) ->
+    [Err | search(Tail)];
 search([{Dir, File} | Tail]) ->
     case lists:keyfind(File, 2, Tail) of
 	false -> 
 	    search(Tail);
 	{Dir2, File} ->
-	    io:format("** ~s hides ~s~n",
-		      [filename:join(Dir, File),
-		       filename:join(Dir2, File)]),
-	    [clash | search(Tail)]
+        Clash = {filename:join(Dir, File), filename:join(Dir2, File)},
+	    [Clash | search(Tail)]
     end.
 
 build([]) -> [];
@@ -523,10 +545,11 @@ build([Dir|Tail]) ->
 
 decorate([], _) -> [];
 decorate([File|Tail], Dir) ->
-    [{Dir, File} | decorate(Tail, Dir)].
+    [{Dir, File} | decorate(Tail, Dir)];
+decorate({error,_}=Err, _) -> Err.
 
 filter(_Ext, Dir, error) ->
-    io:format("** Bad path can't read ~s~n", [Dir]), [];
+    {error, {bad_directory, Dir}};
 filter(Ext, _, {ok,Files}) -> 
     filter2(Ext, length(Ext), Files).
 

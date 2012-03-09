@@ -26,7 +26,7 @@
 	 delete/1, purge/1, soft_purge/1, is_loaded/1, all_loaded/1,
 	 load_binary/1, dir_req/1, object_code/1, set_path_file/1,
 	 sticky_dir/1, pa_pz_option/1, add_del_path/1,
-	 dir_disappeared/1, ext_mod_dep/1, clash/1,
+	 dir_disappeared/1, ext_mod_dep/1, clash/1, get_clash/1,
 	 load_cached/1, start_node_with_cache/1, add_and_rehash/1,
 	 where_is_file_cached/1, where_is_file_no_cache/1,
 	 purge_stacktrace/1, mult_lib_roots/1, bad_erl_libs/1,
@@ -51,8 +51,8 @@ all() ->
      delete, purge, soft_purge, is_loaded, all_loaded,
      load_binary, dir_req, object_code, set_path_file,
      pa_pz_option, add_del_path, dir_disappeared,
-     ext_mod_dep, clash, load_cached, start_node_with_cache,
-     add_and_rehash, where_is_file_no_cache,
+     ext_mod_dep, clash, get_clash, load_cached,
+     start_node_with_cache, add_and_rehash, where_is_file_no_cache,
      where_is_file_cached, purge_stacktrace, mult_lib_roots,
      bad_erl_libs, code_archive, code_archive2, on_load,
      on_load_binary, on_load_embedded, on_load_errors,
@@ -634,6 +634,52 @@ clash(Config) when is_list(Config) ->
     ?line true = code:set_path(P),
     file:delete(TmpEzFile++".moved"), %% Only effect on windows
     ok.
+
+get_clash(Config) when is_list(Config) ->
+    DDir = ?config(data_dir,Config)++"clash/",
+    P = code:get_path(),
+    [TestServerPath|_] = [Path || Path <- code:get_path(), 
+				  re:run(Path,"test_server/?$",[]) /= nomatch],
+
+    %% test non-clashing entries
+
+    %% remove TestServerPath to prevent clash with test-server path
+    ?line true = code:del_path(TestServerPath),
+    ?line true = code:add_path(DDir++"foobar-0.1/ebin"),
+    ?line true = code:add_path(DDir++"zork-0.8/ebin"),
+    ?line [] = code:clash(),
+    ?line true = code:set_path(P),
+
+    %% test clashing entries
+
+    %% remove TestServerPath to prevent clash with test-server path
+    ?line true = code:del_path(TestServerPath),
+    ?line true = code:add_path(DDir++"foobar-0.1/ebin"),
+    ?line true = code:add_path(DDir++"foobar-0.1.ez/foobar-0.1/ebin"),
+    ?line [_,_] = code:clash(),
+    ?line true = code:set_path(P),
+
+    %% test "Bad path can't read"
+
+    %% remove TestServerPath to prevent clash with test-server path
+    Priv = ?config(priv_dir, Config),
+    ?line true = code:del_path(TestServerPath),
+    TmpEzFile = Priv++"foobar-0.tmp.ez",
+    ?line {ok, _} = file:copy(DDir++"foobar-0.1.ez", TmpEzFile),
+    ?line true = code:add_path(TmpEzFile++"/foobar-0.1/ebin"),
+    case os:type() of
+        {win32,_} ->
+	    %% The file wont be deleted on windows until it's closed, why we 
+	    %% need to rename instead.
+	    ?line ok = file:rename(TmpEzFile,TmpEzFile++".moved");
+	 _ ->
+    	    ?line ok = file:delete(TmpEzFile)
+    end,
+    ?line [{},{error,...}] = code:clash(),
+    ?line true = code:set_path(P),
+    file:delete(TmpEzFile++".moved"), %% Only effect on windows
+    ok.
+
 
 ext_mod_dep(suite) ->
     [];

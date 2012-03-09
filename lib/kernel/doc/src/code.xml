@@ -728,6 +728,14 @@ rpc:call(Node, code, load_binary, [Module, Filename, Binary]),
       </desc>
     </func>
     <func>
+      <name name="get_clash" arity="0"/>
+      <fsummary>Search for modules with identical names.</fsummary>
+      <desc>
+        <p>Searches the entire code space for module names with identical names
+        and returns a list of tuples with the two code files clashing.</p>
+      </desc>
+    </func>
+    <func>
       <name name="is_module_native" arity="1"/>
       <fsummary>Test whether a module has native code</fsummary>
       <desc>
